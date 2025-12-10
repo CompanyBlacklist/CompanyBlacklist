@@ -1,0 +1,202 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { config } from '../config.js';
+import fs from 'fs';
+import path from 'path';
+
+// 获取统计数据
+let stats = {
+  totalCompanies: 0,
+  totalReviews: 0,
+  totalReviewers: 0,
+};
+
+// 企业问题排行榜数据
+let issueRankings = [];
+
+// 企业地域分布数据
+let cityDistribution = [];
+
+try {
+    // 在构建时直接读取数据文件
+    // 从web目录向上一级到项目根目录
+    const rootPath = path.join(process.cwd(), '..');
+    
+    // 获取 meta 数据
+    const metaFilePath = path.join(rootPath, 'static_api', 'v1', 'meta.json');
+    if (fs.existsSync(metaFilePath)) {
+      const metaData = JSON.parse(fs.readFileSync(metaFilePath, 'utf8'));
+      stats.totalCompanies = metaData.total_count;
+    }
+    
+    // 获取审核统计数据
+    const auditFilePath = path.join(rootPath, 'static_api', 'v1', 'audit_stats.json');
+    if (fs.existsSync(auditFilePath)) {
+      const auditData = JSON.parse(fs.readFileSync(auditFilePath, 'utf8'));
+      stats.totalReviews = auditData.total_reviews;
+      stats.totalReviewers = Object.keys(auditData.reviewers).length;
+    }
+    
+    // 获取热门企业数据，用于生成排行榜
+    const hotFilePath = path.join(rootPath, 'static_api', 'v1', 'hot.json');
+    if (fs.existsSync(hotFilePath)) {
+      const hotData = JSON.parse(fs.readFileSync(hotFilePath, 'utf8'));
+      
+      // 统计问题标签使用次数
+      const issueCount = {};
+      const cityCount = {};
+      
+      // 遍历所有热门企业
+      for (const company of hotData) {
+        // 统计问题标签
+        if (company.t && company.t.length > 0) {
+          for (const tag of company.t) {
+            issueCount[tag] = (issueCount[tag] || 0) + 1;
+          }
+        }
+        
+        // 统计地域分布
+        if (company.c) {
+          cityCount[company.c] = (cityCount[company.c] || 0) + 1;
+        }
+      }
+      
+      // 转换为排行榜格式
+      issueRankings = Object.entries(issueCount)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+      
+      // 转换为地域分布格式
+      cityDistribution = Object.entries(cityCount)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+    }
+} catch (error) {
+  console.error('Error fetching data:', error);
+}
+---
+
+<Layout title="统计数据 - 职场避雷针" description="职场避雷针平台的统计数据和排行榜">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">统计数据</h1>
+    
+    <!-- 基础统计 -->
+    <section class="mb-12">
+      <h2 class="text-xl font-bold text-gray-800 mb-6">基础统计</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="card text-center">
+          <div class="text-4xl font-bold text-primary mb-2">{stats.totalCompanies}</div>
+          <div class="text-gray-600">收录企业</div>
+        </div>
+        <div class="card text-center">
+          <div class="text-4xl font-bold text-primary mb-2">{stats.totalCompanies}</div>
+          <div class="text-gray-600">审核通过</div>
+        </div>
+        <div class="card text-center">
+          <div class="text-4xl font-bold text-primary mb-2">{stats.totalReviewers}</div>
+          <div class="text-gray-600">志愿者</div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 企业问题排行榜 -->
+    <section class="mb-12">
+      <h2 class="text-xl font-bold text-gray-800 mb-6">企业问题排行榜</h2>
+      <div class="card">
+        <div class="h-80 overflow-y-auto pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">排名</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">问题类型</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">使用次数</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                {issueRankings.length > 0 ? (
+                  issueRankings.map((issue, index) => (
+                    <tr key={issue.name} class={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-bold mr-2">{index + 1}</span>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{issue.name}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">{issue.count}</div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colspan="3" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">暂无数据</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 企业地域分布 -->
+    <section class="mb-12">
+      <h2 class="text-xl font-bold text-gray-800 mb-6">企业地域分布</h2>
+      <div class="card">
+        <div class="h-80 overflow-y-auto pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">排名</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">城市</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">企业数量</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">占比</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                {cityDistribution.length > 0 ? (
+                  cityDistribution.map((city, index) => {
+                    const percentage = ((city.count / stats.totalCompanies) * 100).toFixed(1);
+                    return (
+                      <tr key={city.name} class={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-bold mr-2">{index + 1}</span>
+                          </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <div class="text-sm font-medium text-gray-900">{city.name}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <div class="text-sm text-gray-500">{city.count}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <div class="text-sm text-gray-500">{percentage}%</div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">暂无数据</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 数据更新时间 -->
+    <section class="mb-12">
+      <div class="card p-4 text-center text-sm text-gray-500">
+        数据更新时间: {new Date().toLocaleString('zh-CN')}
+      </div>
+    </section>
+  </div>
+</Layout>

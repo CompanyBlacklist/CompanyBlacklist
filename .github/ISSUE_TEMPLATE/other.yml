@@ -1,0 +1,49 @@
+name: 其他问题/建议
+description: 提出其他问题或建议
+title: "[建议] 问题/建议标题"
+labels: ["type:other", "status:pending"]
+body:
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: 问题类型
+      description: 请选择问题类型
+      options:
+        - 功能建议
+        - 技术问题
+        - 网站反馈
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 详细描述
+      description: 请详细描述您的问题或建议
+      placeholder: 请详细描述您的问题或建议...
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截图（可选）
+      description: 如有相关截图，请在此处提供
+      placeholder: 请提供截图...
+
+  - type: input
+    id: contact
+    attributes:
+      label: 联系方式（可选）
+      description: 请提供您的联系方式，以便我们与您联系
+      placeholder: 如：email@example.com
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 声明与承诺
+      description: 请确认以下内容
+      options:
+        - label: 我已阅读并同意项目的《免责声明》
+          required: true

@@ -1,0 +1,109 @@
+---
+// Type definitions
+interface MediaItem {
+  type: 'image' | 'video' | 'audio'
+  src: string
+  thumbnail: string
+  width?: number
+  height?: number
+  poster?: string // 视频专用
+  caption?: string
+  alt?: string
+  thumbnailWidth?: number
+  thumbnailHeight?: number
+}
+
+// Props
+export interface Props {
+  mediaItems: MediaItem[]
+}
+
+const { mediaItems } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
+---
+
+<div class="media-gallery grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+  {mediaItems.map((item, index) => (
+    <a
+      key={index}
+      href={item.src}
+      class="media-item block overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+      data-fancybox="gallery"
+      data-type={item.type || 'image'}
+      data-caption={item.caption}
+      data-width={item.width}
+      data-height={item.height}
+      data-poster={item.poster || ''}
+      aria-label={item.alt || `View ${item.type}`}
+      title={item.caption}
+    >
+      <div class="relative pb-[75%]"> <!-- 4:3 宽高比 -->
+        {item.type === 'image' ? (
+          <img
+            src={item.thumbnail}
+            alt={item.alt || item.caption || `Media thumbnail ${index + 1}`}
+            class="absolute inset-0 w-full h-full object-cover"
+            width={item.thumbnailWidth}
+            height={item.thumbnailHeight}
+            loading={index > 3 ? "lazy" : "eager"}
+          />
+        ) : item.type === 'video' ? (
+          <div class="absolute inset-0 flex items-center justify-center bg-gray-900">
+            <div class="text-white text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+              </svg>
+              <span class="mt-2 block text-sm font-medium">视频</span>
+            </div>
+            {item.poster && (
+              <img 
+                src={item.poster} 
+                alt={item.alt || item.caption}
+                class="absolute inset-0 w-full h-full object-cover opacity-50"
+              />
+            )}
+          </div>
+        ) : item.type === 'audio' ? (
+          <div class="absolute inset-0 flex items-center justify-center bg-gray-800">
+            <div class="text-white text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM6.7 4.8a1 1 0 00-1.4 1.166l1.5 5.5a1 1 0 001.945-.464L9 9.01V11a1 1 0 102 0V7a1 1 0 00-1.707-.707l-1 1a1 1 0 001.414 1.414l.263-.263L12 6.99V9a1 1 0 102 0V5a1 1 0 00-1.707-.707l-1 1a1 1 0 101.414 1.414l.353-.353L14.7 4.8a1 1 0 00-1.4-1.166l-2.5 1.5a1 1 0 001.4 1.166l.354-.212L12 5.01V7a1 1 0 00-1.707-.707l-1-1A1 1 0 008.7 5.01v-.22L6.7 4.8z" clip-rule="evenodd" />
+              </svg>
+              <span class="mt-2 block text-sm font-medium">音频</span>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </a>
+  ))}
+</div>
+
+<!-- 预加载提示 -->
+{mediaItems.slice(0, 4).map((item, index) => (
+  <link 
+    key={`preload-${index}`}
+    rel="preload" 
+    href={item.thumbnail} 
+    as="image"
+    fetchpriority={index < 2 ? "high" : "auto"}
+  />
+))}
+
+<style>
+  /* 自定义 CSS 变量 */
+  :root {
+    --media-gallery-gap: 1rem;
+    --media-item-hover-opacity: 0.8;
+    --media-item-border-radius: 0.5rem;
+  }
+  
+  /* 媒体项样式增强 */
+  .media-item {
+    border-radius: var(--media-item-border-radius);
+  }
+  
+  /* 确保视频缩略图正确显示 */
+  .media-item img {
+    object-fit: cover;
+  }
+</style>

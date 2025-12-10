@@ -1,0 +1,31 @@
+{
+  "name": "CompanyBlacklist-web",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "CompanyBlacklist Web 前端项目",
+  "scripts": {
+    "dev": "set SHARP_DISABLE=1 && astro dev",
+    "start": "set SHARP_DISABLE=1 && astro dev",
+    "build": "set SHARP_DISABLE=1 && node -e \"const fs = require('fs'); const path = require('path'); function copyDir(src, dest) { if (!fs.existsSync(dest)) { fs.mkdirSync(dest, { recursive: true }); } for (const item of fs.readdirSync(src, { withFileTypes: true })) { const srcPath = path.join(src, item.name); const destPath = path.join(dest, item.name); if (item.isDirectory()) { copyDir(srcPath, destPath); } else { fs.copyFileSync(srcPath, destPath); } } } copyDir(path.join('..', 'static_api'), path.join('public', 'static_api'));\" && astro build",
+    "preview": "set SHARP_DISABLE=1 && astro preview",
+    "astro": "set SHARP_DISABLE=1 && astro"
+  },
+  "keywords": [
+    "astro",
+    "CompanyBlacklist",
+    "web"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@astrojs/sitemap": "^3.0.0",
+    "@astrojs/tailwind": "^5.0.0",
+    "@fancyapps/ui": "^6.1.7",
+    "astro": "^4.0.0",
+    "marked": "^17.0.1",
+    "medium-zoom": "^1.1.0",
+    "minisearch": "^6.0.0",
+    "qrcode": "^1.5.4",
+    "tailwindcss": "^3.4.0"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": 6,
+  "name": "测试未来信息技术有限公司",
+  "city": "上海",
+  "tags": [
+    "裁员不赔偿",
+    "社保公积金违规",
+    "职场歧视（性别/年龄/地域等）",
+    "竞业协议违规"
+  ],
+  "title": "恶意PIP（绩效改进计划）变相裁员",
+  "body_html": "<h3>公司全称</h3>\n<p>测试未来信息技术有限公司</p>\n<h3>所在城市</h3>\n<p>上海</p>\n<h3>问题标签</h3>\n<ul>\n<li><p> 裁员不赔偿</p>\n</li>\n<li><p> 社保公积金违规</p>\n</li>\n<li><p> 职场歧视（性别/年龄/地域等）</p>\n</li>\n<li><p> 竞业协议违规</p>\n</li>\n</ul>\n<h3>详细描述</h3>\n<h3>个人背景</h3>\n<p>本人 2023 年入职，连续 3 个季度绩效为 A/B+，从未有过违纪记录。</p>\n<h3>事件经过</h3>\n<p><strong>1. 突如其来的“低绩效”</strong>\n2025年1月初，主管突然找我谈话，说我上季度产出不够（实际上我完成了所有OKR，并且承担了离职同事的交接工作），直接给了我一个 <strong>C（不合格）</strong>。</p>\n<p><strong>2. 不可能的 PIP 计划</strong>\nHR 随即介入，要求我签署《绩效改进计划（PIP）》。我看了一眼内容，简直离谱：</p>\n<ul>\n<li>要求在一个月内重构核心模块代码（正常排期需要 3 个月）。</li>\n<li>要求通过非技术手段将用户留存率提升 20%。</li>\n<li><strong>每日汇报</strong>：要求每天早晚各写一份 2000 字的日报和反思。</li>\n</ul>\n<p><img /></p>\n<p><strong>3. 精神施压与监控</strong>\n拒绝签署后，噩梦开始了：</p>\n<ul>\n<li>工位被强制调到监控摄像头正下方。</li>\n<li>主管每小时来查岗一次，上厕所超过 10 分钟就会被在群里@。</li>\n<li>HR 每天下午 4 点约谈，反复洗脑：“你在这个行业混不下去了”、“公司不开除你是给你面子”。</li>\n</ul>\n<p><img /></p>\n<p><strong>4. 最终结局</strong>\n熬了半个月，我身体出了问题（重度焦虑），去医院开了假条。公司竟然以“虚假病假”为由发了《解除劳动合同通知书》，且拒绝支付任何赔偿金。目前已申请劳动仲裁。</p>\n<p><strong>总结</strong>：这家公司表面光鲜，实际上就是通过恶心人来省裁员费，大家千万别来填坑！</p>\n<h3>证据材料</h3>\n<ul>\n<li><strong>PIP 计划书扫描件</strong></li>\n</ul>\n<p><img /></p>\n<ul>\n<li><strong>微信聊天记录</strong>：主管凌晨 2 点发消息辱骂截图。</li>\n</ul>\n<p><img /></p>\n<ul>\n<li><strong>医院诊断证明</strong>：焦虑状态、睡眠障碍。</li>\n</ul>\n<h3>声明与承诺</h3>\n<ul>\n<li> 我保证所提供的信息真实可靠</li>\n<li> 我同意公开我的 GitHub 用户名（用于身份验证）</li>\n<li> 我已阅读并同意项目的《免责声明》</li>\n</ul>\n",
+  "raw_body": "### 公司全称\n\n测试未来信息技术有限公司\n\n### 所在城市\n\n上海\n\n### 问题标签\n\n- [ ] 强制加班（996/007/其他？）\n- [ ] 拖欠工资/奖金\n- [x] 裁员不赔偿\n- [ ] 职场PUA/精神压迫\n- [x] 社保公积金违规\n- [ ] 试用期违规\n- [x] 职场歧视（性别/年龄/地域等）\n- [ ] 虚假招聘\n- [x] 竞业协议违规\n- [ ] 强迫辞职\n- [ ] 不提供离职证明\n- [ ] 劳动保护缺失\n- [ ] 培训费用陷阱\n- [ ] 其他问题\n\n### 详细描述\n\n### 个人背景\n本人 2023 年入职，连续 3 个季度绩效为 A/B+，从未有过违纪记录。\n\n### 事件经过\n**1. 突如其来的“低绩效”**\n2025年1月初，主管突然找我谈话，说我上季度产出不够（实际上我完成了所有OKR，并且承担了离职同事的交接工作），直接给了我一个 **C（不合格）**。\n\n**2. 不可能的 PIP 计划**\nHR 随即介入，要求我签署《绩效改进计划（PIP）》。我看了一眼内容，简直离谱：\n* 要求在一个月内重构核心模块代码（正常排期需要 3 个月）。\n* 要求通过非技术手段将用户留存率提升 20%。\n* **每日汇报**：要求每天早晚各写一份 2000 字的日报和反思。\n\n![Image](https://github.com/user-attachments/assets/75a827c9-92e8-47b9-a5a1-8c1adb2f792c)\n\n**3. 精神施压与监控**\n拒绝签署后，噩梦开始了：\n* 工位被强制调到监控摄像头正下方。\n* 主管每小时来查岗一次，上厕所超过 10 分钟就会被在群里@。\n* HR 每天下午 4 点约谈，反复洗脑：“你在这个行业混不下去了”、“公司不开除你是给你面子”。\n\n![Image](https://github.com/user-attachments/assets/24fd939b-d151-4192-860e-cfde34314572)\n\n**4. 最终结局**\n熬了半个月，我身体出了问题（重度焦虑），去医院开了假条。公司竟然以“虚假病假”为由发了《解除劳动合同通知书》，且拒绝支付任何赔偿金。目前已申请劳动仲裁。\n\n**总结**：这家公司表面光鲜，实际上就是通过恶心人来省裁员费，大家千万别来填坑！\n\n### 证据材料\n\n* **PIP 计划书扫描件**\n\n![Image](https://github.com/user-attachments/assets/7e676667-d0c4-4feb-95fc-b478a70ad11c)\n\n* **微信聊天记录**：主管凌晨 2 点发消息辱骂截图。\n\n![Image](https://github.com/user-attachments/assets/cba741c2-c857-476d-8c8a-870896a697eb)\n\n* **医院诊断证明**：焦虑状态、睡眠障碍。\n\n### 声明与承诺\n\n- [x] 我保证所提供的信息真实可靠\n- [x] 我同意公开我的 GitHub 用户名（用于身份验证）\n- [x] 我已阅读并同意项目的《免责声明》",
+  "images": [
+    "https://github.com/user-attachments/assets/75a827c9-92e8-47b9-a5a1-8c1adb2f792c",
+    "https://github.com/user-attachments/assets/24fd939b-d151-4192-860e-cfde34314572",
+    "https://github.com/user-attachments/assets/7e676667-d0c4-4feb-95fc-b478a70ad11c",
+    "https://github.com/user-attachments/assets/cba741c2-c857-476d-8c8a-870896a697eb"
+  ],
+  "audit_info": {
+    "first_reviewer": "OpenBlacklist",
+    "final_reviewer": "OpenBlacklist",
+    "approved_at": "2025-12-09T02:37:46Z"
+  },
+  "source_url": "https://github.com/CompanyBlacklist/CompanyBlacklist/issues/6",
+  "report_url": "https://github.com/OpenBlacklist/CompanyBlacklist/issues/new?template=appeal.yml&title=[申诉] 恶意PIP（绩效改进计划）变相裁员 - &body=公司ID: 6",
+  "created_at": "2025-12-09T02:37:29Z",
+  "updated_at": "2025-12-09T02:37:46Z"
+}

@@ -1,0 +1,21 @@
+{
+  "id": 1,
+  "name": "testco",
+  "city": "testcity",
+  "tags": [
+    "虚假招聘"
+  ],
+  "title": "testco - testcity",
+  "body_html": "<h3>公司全称</h3>\n<p>testco</p>\n<h3>所在城市</h3>\n<p>testcity</p>\n<h3>问题标签</h3>\n<ul>\n<li> 虚假招聘</li>\n</ul>\n<h3>详细描述</h3>\n<p>testcity</p>\n<h3>证据材料</h3>\n<p>testcity</p>\n<h3>声明与承诺</h3>\n<ul>\n<li> 我保证所提供的信息真实可靠</li>\n<li> 我同意公开我的 GitHub 用户名（用于身份验证）</li>\n<li> 我已阅读并同意项目的《免责声明》</li>\n</ul>\n",
+  "raw_body": "### 公司全称\n\ntestco\n\n### 所在城市\n\ntestcity\n\n### 问题标签\n\n- [ ] 强制加班（996/007/其他？）\n- [ ] 拖欠工资/奖金\n- [ ] 裁员不赔偿\n- [ ] 职场PUA/精神压迫\n- [ ] 社保公积金违规\n- [ ] 试用期违规\n- [ ] 职场歧视（性别/年龄/地域等）\n- [x] 虚假招聘\n- [ ] 竞业协议违规\n- [ ] 强迫辞职\n- [ ] 不提供离职证明\n- [ ] 劳动保护缺失\n- [ ] 培训费用陷阱\n- [ ] 其他问题\n\n### 详细描述\n\ntestcity\n\n### 证据材料\n\ntestcity\n\n### 声明与承诺\n\n- [x] 我保证所提供的信息真实可靠\n- [x] 我同意公开我的 GitHub 用户名（用于身份验证）\n- [x] 我已阅读并同意项目的《免责声明》",
+  "images": [],
+  "audit_info": {
+    "first_reviewer": "OpenBlacklist",
+    "final_reviewer": "OpenBlacklist",
+    "approved_at": "2025-12-08T12:50:44Z"
+  },
+  "source_url": "https://github.com/CompanyBlacklist/CompanyBlacklist/issues/1",
+  "report_url": "https://github.com/OpenBlacklist/CompanyBlacklist/issues/new?template=appeal.yml&title=[申诉] testco - testcity&body=公司ID: 1",
+  "created_at": "2025-12-08T10:50:23Z",
+  "updated_at": "2025-12-08T12:50:44Z"
+}

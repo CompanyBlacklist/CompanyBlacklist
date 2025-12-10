@@ -1,0 +1,35 @@
+name: Sync GitHub Labels
+
+on:
+  # 当推送到main分支且labels.yml文件有更改时触发
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/labels.yml'
+      - '.github/workflows/sync-labels.yml'
+  # 手动触发
+  workflow_dispatch:
+
+jobs:
+  sync-labels:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Sync labels from labels.yml
+        uses: micnncim/action-label-syncer@v1.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # 标签配置文件路径
+          manifest: .github/labels.yml
+          # 是否删除不在配置文件中的标签（设为false更安全）
+          delete: false
+          # 是否仅添加新标签而不更新现有标签
+          dry_run: false
+          # 是否输出详细日志
+          verbose: true

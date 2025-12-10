@@ -1,0 +1,1053 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AuditCard from '../../components/AuditCard.astro';
+import { config } from '../../config.js';
+import { marked } from 'marked';
+import QRCode from 'qrcode';
+
+// 静态生成配置 - 从静态 API 获取数据并生成路径
+// 使用fs模块读取文件，避免使用await
+import fs from 'fs';
+import path from 'path';
+
+export function getStaticPaths() {
+  try {
+    // 从文件系统读取索引数据
+    // 在构建时，Astro会在web目录执行，需要向上一级到项目根目录
+    const rootPath = path.join(process.cwd(), '..');
+    const indexFilePath = path.join(rootPath, 'static_api', 'v1', '_index.json');
+    
+    // 同步读取文件内容
+    const indexContent = fs.readFileSync(indexFilePath, 'utf8');
+    const indexData = JSON.parse(indexContent);
+    
+    // 生成静态路径
+    return indexData.map(item => ({
+      params: { id: item.id.toString() }
+    }));
+  } catch (error) {
+    // 静默处理错误，使用默认路径
+    // 如果生成失败，尝试手动生成一些静态路径，避免构建失败
+    // 这里使用一个默认的ID列表，确保至少有一些页面被生成
+    return [
+      { params: { id: '1' } },
+      { params: { id: '2' } },
+      { params: { id: '4' } }
+    ];
+  }
+}
+
+const { id } = Astro.params;
+
+// 获取公司详情数据
+let companyData = null;
+let relatedCompanies = [];
+
+// 使用固定数量2作为相关推荐数量
+        const MAX_RELATED = 2;
+
+try {
+  // 在构建时直接读取数据文件
+  // 使用 Node.js 文件系统 API，确保能访问到项目根目录下的 static_api 文件夹
+  const rootPath = path.join(process.cwd(), '..');
+  const prefix = Math.floor(Number(id) / 100);
+  
+  // 读取公司详情数据
+  const companyFilePath = path.join(rootPath, 'static_api', 'v1', 'items', prefix.toString(), `${id}.json`);
+  const companyContent = fs.readFileSync(companyFilePath, 'utf8');
+  companyData = JSON.parse(companyContent);
+  
+  if (companyData) {
+    // 获取相关公司数据
+    const indexFilePath = path.join(rootPath, 'static_api', 'v1', '_index.json');
+    const indexContent = fs.readFileSync(indexFilePath, 'utf8');
+    const indexData = JSON.parse(indexContent);
+    
+    // 获取所有公司数据
+    const allCompanies = [];
+    for (const item of indexData) {
+      try {
+        const itemPrefix = Math.floor(item.id / 100);
+        const itemFilePath = path.join(rootPath, 'static_api', 'v1', 'items', itemPrefix.toString(), `${item.id}.json`);
+        const itemContent = fs.readFileSync(itemFilePath, 'utf8');
+        const itemData = JSON.parse(itemContent);
+        allCompanies.push(itemData);
+      } catch (error) {
+        // 静默处理错误，跳过无效数据
+        continue;
+      }
+    }
+    
+    // 根据标签和城市相似度计算相关度
+    relatedCompanies = allCompanies
+      .filter(company => company.id !== companyData.id) // 排除当前公司
+      .map(company => {
+        // 计算相关度分数
+        let score = 0;
+        
+        // 标签匹配（每个匹配的标签加1分）
+        const commonTags = company.tags.filter(tag => companyData.tags.includes(tag));
+        score += commonTags.length;
+        
+        // 城市匹配（匹配加2分）
+        if (company.city === companyData.city) {
+          score += 2;
+        }
+        
+        return { ...company, score };
+      })
+      .sort((a, b) => b.score - a.score) // 按相关度降序排序
+      .slice(0, MAX_RELATED); // 取前MAX_RELATED个
+  }
+} catch (error) {
+  // 静默处理错误
+}
+
+if (!companyData) {
+  // 使用正确的404路径，Astro会自动处理
+  return Astro.redirect(`${config.paths.prefix}/404`);
+}
+
+// 解析 Markdown 内容
+  const parseMarkdown = (content) => {
+    // 如果内容为空，直接返回
+    if (!content) return '';
+    
+    // 使用 marked 解析 Markdown 为 HTML
+    return marked.parse(content);
+  };
+
+  // 构建 Schema.org 结构化数据
+  const schemaOrgData = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: companyData.name,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: companyData.city,
+    },
+    url: Astro.url.href,
+    description: `CompanyBlacklist - ${companyData.name} 避雷信息`,
+    keywords: companyData.tags.join(', '),
+  };
+
+  // 从body_html中提取选中的问题标签
+  const extractCheckedTags = (bodyHtml) => {
+    const tags = [];
+    
+    // 如果bodyHtml为空，直接返回
+    if (!bodyHtml) return tags;
+    
+    // 检查bodyHtml是Markdown格式还是HTML格式
+    const isHtml = bodyHtml.includes('<h3>');
+    
+    if (isHtml) {
+      // 处理HTML格式
+      const htmlTagsRegex = /<h3>问题标签<\/h3>[\s\S]+?(?:<h3>|$)/i;
+      const htmlMatch = bodyHtml.match(htmlTagsRegex);
+      
+      if (htmlMatch && htmlMatch[0]) {
+        // 匹配所有被选中的标签（HTML格式，带有[x]标记）
+        const checkedTagRegex = /<li>(?:.*?)\[x\](?:.*?)>(.*?)<\/li>/gi;
+        let tagMatch;
+        while ((tagMatch = checkedTagRegex.exec(htmlMatch[0])) !== null) {
+          if (tagMatch[1]) {
+            // 提取标签文本，去除HTML标签和空格
+            const tagText = tagMatch[1].replace(/<[^>]*>/g, '').trim();
+            // 只有非空标签才添加
+            if (tagText) {
+              tags.push(tagText);
+            }
+          }
+        }
+      }
+    } else {
+      // 处理Markdown格式
+      const markdownTagsRegex = /### 问题标签[\s\S]+?(?:###|$)/;
+      const markdownMatch = bodyHtml.match(markdownTagsRegex);
+      
+      if (markdownMatch && markdownMatch[0]) {
+        // 匹配所有被选中的标签（Markdown格式）
+        const checkedTagsRegex = /- \[x\] (.+)/g;
+        let tagMatch;
+        while ((tagMatch = checkedTagsRegex.exec(markdownMatch[0])) !== null) {
+          if (tagMatch[1]) {
+            tags.push(tagMatch[1].trim());
+          }
+        }
+      }
+    }
+    
+    return tags;
+  };
+
+  // 从body_html中提取声明与承诺内容，返回承诺项数组
+  const extractDeclaration = (bodyHtml) => {
+    const declarations = [];
+    
+    // 匹配Markdown格式的声明与承诺
+    const markdownDeclarationsRegex = /### 声明与承诺[\s\S]+?(?:###|$)/;
+    const markdownMatch = bodyHtml.match(markdownDeclarationsRegex);
+    
+    if (markdownMatch && markdownMatch[0]) {
+      // 匹配所有被选中的承诺项（Markdown格式）
+      const checkedDeclarationsRegex = /- \[x\] (.+)/g;
+      let declarationMatch;
+      while ((declarationMatch = checkedDeclarationsRegex.exec(markdownMatch[0])) !== null) {
+        if (declarationMatch[1]) {
+          declarations.push(declarationMatch[1].trim());
+        }
+      }
+    } else {
+      // 匹配HTML格式的声明与承诺
+      const htmlDeclarationsRegex = /<h3>声明与承诺<\/h3>[\s\S]+?(?:<h3>|$)/;
+      const htmlMatch = bodyHtml.match(htmlDeclarationsRegex);
+      
+      if (htmlMatch && htmlMatch[0]) {
+        // 匹配所有承诺项（HTML格式）
+        const declarationItemsRegex = /<li>(.+?)<\/li>/g;
+        let declarationMatch;
+        while ((declarationMatch = declarationItemsRegex.exec(htmlMatch[0])) !== null) {
+          if (declarationMatch[1]) {
+            const declarationText = declarationMatch[1].trim();
+            // 跳过空标签
+            if (declarationText) {
+              declarations.push(declarationText);
+            }
+          }
+        }
+      }
+    }
+    
+    return declarations;
+  };
+
+  // 提取章节内容
+  const extractSection = (content, header, nextHeaders = [], isRaw) => {
+    if (!content) return '';
+    try {
+      if (isRaw) {
+        // Markdown: 匹配 ### Header ... 直到下一个指定的 Header 或结束
+        // 如果 nextHeaders 为空，默认行为是遇到任意 ### 就停止（旧行为），
+        // 但为了支持内容中包含子标题（###），我们需要指定明确的下一个一级标题。
+        
+        let lookahead;
+        if (nextHeaders && nextHeaders.length > 0) {
+          // 构建正则：Lookahead for \n### (NextHeader1|NextHeader2)
+          lookahead = `(?=(?:\\n|\\r)###\\s*(?:${nextHeaders.join('|')})|$)`;
+        } else {
+          // 默认行为：遇到任意 ### 就停止（谨慎使用）
+          lookahead = `(?=(?:\\n|\\r)###|$)`;
+        }
+
+        const regex = new RegExp(`###\\s*${header}[\\s\\S]*?${lookahead}`, 'i');
+        const match = content.match(regex);
+        if (match) {
+          // 移除标题行，只保留内容
+          return match[0].replace(new RegExp(`###\\s*${header}`, 'i'), '').trim();
+        }
+      } else {
+        // HTML: 匹配 <h3>Header</h3> ... 直到下一个指定的 HTML Header 或结束
+        let lookahead;
+        if (nextHeaders && nextHeaders.length > 0) {
+          lookahead = `(?=<h3[^>]*>\\s*(?:${nextHeaders.join('|')})\\s*<\\/h3>|$)`;
+        } else {
+          lookahead = `(?=<h3|$)`;
+        }
+        
+        const regex = new RegExp(`<h3[^>]*>\\s*${header}\\s*<\\/h3>[\\s\\S]*?${lookahead}`, 'i');
+        const match = content.match(regex);
+        if (match) {
+          // 移除标题行
+          return match[0].replace(new RegExp(`<h3[^>]*>\\s*${header}\\s*<\\/h3>`, 'i'), '').trim();
+        }
+      }
+    } catch (e) {
+      console.error('Error extracting section:', e);
+    }
+    return '';
+  };
+
+  // 提取选中的问题标签
+  const checkedTags = companyData.tags.length > 0 ? companyData.tags : 
+    (companyData.raw_body ? extractCheckedTags(companyData.raw_body) : extractCheckedTags(companyData.body_html));
+  
+  if (companyData.tags.length === 0) {
+    companyData.tags = checkedTags;
+  }
+  
+  // 提取声明与承诺内容
+  const declarationContent = extractDeclaration(companyData.body_html);
+  
+  // 提取详细描述和证据材料
+  // 明确指定下一个可能的标题，以允许内容中包含其他 ### 子标题
+  let descriptionHtml = '';
+  let evidenceHtml = '';
+  
+  if (companyData.raw_body) {
+    // 详细描述后可能是：证据材料、声明与承诺
+    const descRaw = extractSection(companyData.raw_body, '详细描述', ['证据材料', '声明与承诺'], true);
+    // 证据材料后可能是：声明与承诺
+    const evidRaw = extractSection(companyData.raw_body, '证据材料', ['声明与承诺'], true);
+    
+    descriptionHtml = parseMarkdown(descRaw);
+    evidenceHtml = parseMarkdown(evidRaw);
+  } else {
+    // HTML 模式同理
+    descriptionHtml = extractSection(companyData.body_html, '详细描述', ['证据材料', '声明与承诺'], false);
+    evidenceHtml = extractSection(companyData.body_html, '证据材料', ['声明与承诺'], false);
+  }
+  
+  // 如果提取失败（可能是旧数据格式），尝试回退
+  if (!descriptionHtml && !evidenceHtml) {
+    // 如果没有 raw_body，直接使用 body_html，但尝试去除标题
+    if (companyData.body_html) {
+      const cleanFallback = cleanBodyHtml(companyData.body_html, false);
+      descriptionHtml = parseMarkdown(cleanFallback);
+    }
+  }
+---
+
+<Layout title={`${companyData.name} - 职场避雷针`} description={`${companyData.name} 避雷信息，来自职场避雷针平台`}>
+  <!-- SEO Meta 标签 -->
+  <meta name="keywords" content={companyData.tags.join(', ')} />
+  <link rel="canonical" href={Astro.url.href} />
+  
+  <!-- 实锤问题标签样式 -->
+  <style>
+    /* 容器：横向排列，自动换行 */
+    .warning-tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px; /* 标签间距 */
+      padding: 10px 0;
+    }
+
+    /* 标签基础样式 */
+    .warning-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      border-radius: 4px; /* 稍微方一点，显得严肃 */
+      font-weight: 500;
+      
+      /* 核心配色：红底红字（警示色） */
+      background-color: #fff2f0;
+      border: 1px solid #ffccc7;
+      color: #cf1322;
+    }
+
+    /* 可选：加一个小图标增强语义 */
+    .warning-tag::before {
+      content: "⚠️";
+      margin-right: 6px;
+      font-size: 12px;
+    }
+    /* Markdown 内容样式 */
+    .markdown-content {
+      /* 全局样式重置 */
+      line-height: 1.6;
+      color: #4b5563;
+    }
+    
+    .markdown-content :global(h1), 
+    .markdown-content :global(h2), 
+    .markdown-content :global(h3), 
+    .markdown-content :global(h4), 
+    .markdown-content :global(h5), 
+    .markdown-content :global(h6) {
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    
+    .markdown-content :global(h1) {
+      font-size: 1.875rem;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 0.5rem;
+    }
+    
+    .markdown-content :global(h2) {
+      font-size: 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 0.5rem;
+    }
+    
+    .markdown-content :global(h3) {
+      font-size: 1.25rem;
+    }
+    
+    .markdown-content :global(h4) {
+      font-size: 1.125rem;
+    }
+    
+    .markdown-content :global(h5), 
+    .markdown-content :global(h6) {
+      font-size: 1rem;
+    }
+    
+    .markdown-content :global(p) {
+      margin-bottom: 1rem;
+    }
+    
+    .markdown-content :global(ul), 
+    .markdown-content :global(ol) {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .markdown-content :global(ul) {
+      list-style-type: disc;
+    }
+    
+    .markdown-content :global(ol) {
+      list-style-type: decimal;
+    }
+    
+    .markdown-content :global(li) {
+      margin-bottom: 0.5rem;
+    }
+    
+    .markdown-content :global(li > ul), 
+    .markdown-content :global(li > ol) {
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+    }
+    
+    .markdown-content :global(input[type="checkbox"]) {
+      margin-right: 0.75rem;
+      width: 18px;
+      height: 18px;
+      accent-color: #3b82f6;
+      cursor: pointer;
+      margin-top: 0.25rem;
+    }
+    
+    .markdown-content :global(ul li) {
+      list-style-type: none;
+      position: relative;
+      padding-left: 0;
+    }
+    
+    .markdown-content :global(ul li:before) {
+      content: "•";
+      color: #3b82f6;
+      font-weight: bold;
+      display: inline-block;
+      width: 1em;
+      margin-left: -1em;
+    }
+    
+    .markdown-content :global(ul li:has(input[type="checkbox"])) {
+      list-style-type: none;
+    }
+    
+    .markdown-content :global(ul li:has(input[type="checkbox"]):before) {
+      content: none;
+    }
+    
+    .markdown-content :global(strong) {
+      font-weight: 600;
+      color: #1f2937;
+    }
+    
+    .markdown-content :global(em) {
+      font-style: italic;
+    }
+    
+    .markdown-content :global(a) {
+      color: #3b82f6;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+    
+    .markdown-content :global(a:hover) {
+      color: #2563eb;
+    }
+    
+    .markdown-content :global(code) {
+      background-color: #f3f4f6;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem;
+      font-family: monospace;
+      font-size: 0.875rem;
+      color: #dc2626;
+    }
+    
+    .markdown-content :global(pre) {
+      background-color: #f3f4f6;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin-bottom: 1rem;
+    }
+    
+    .markdown-content :global(pre code) {
+      background-color: transparent;
+      padding: 0;
+      color: inherit;
+    }
+    
+    /* 针对详情页内容的图片限制 */
+    .markdown-content :global(img) {
+      max-width: 100%;
+      max-height: 480px; /* 稍微增加一点高度，避免小图也被压太小，但限制超长图 */
+      width: auto;
+      height: auto;
+      display: block;
+      margin: 1rem auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      object-fit: contain;
+      cursor: zoom-in;
+      transition: all 0.3s ease;
+    }
+    
+    .markdown-content :global(img:hover) {
+      transform: scale(1.02);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .markdown-content {
+        font-size: 0.9rem;
+      }
+      
+      .markdown-content :global(h1) {
+        font-size: 1.5rem;
+      }
+      
+      .markdown-content :global(h2) {
+        font-size: 1.25rem;
+      }
+      
+      .markdown-content :global(h3) {
+        font-size: 1.125rem;
+      }
+      
+      .markdown-content :global(ul), 
+      .markdown-content :global(ol) {
+        margin-left: 1rem;
+      }
+      
+      .markdown-content :global(input[type="checkbox"]) {
+        width: 16px;
+        height: 16px;
+      }
+      
+      .markdown-content :global(img) {
+        max-height: 300px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .markdown-content {
+        font-size: 0.875rem;
+      }
+      
+      .markdown-content :global(h1) {
+        font-size: 1.375rem;
+      }
+      
+      .markdown-content :global(h2) {
+        font-size: 1.125rem;
+      }
+      
+      .markdown-content :global(h3) {
+        font-size: 1rem;
+      }
+      
+      .markdown-content :global(p) {
+        margin-bottom: 0.75rem;
+      }
+      
+      .markdown-content :global(li) {
+        margin-bottom: 0.375rem;
+      }
+      
+      .markdown-content :global(img) {
+        max-height: 250px;
+      }
+    }
+  </style>
+
+  <!-- Schema.org 结构化数据 -->
+  <script type="application/ld+json">
+    {JSON.stringify(schemaOrgData)}
+  </script>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+      <!-- 主内容区域 -->
+      <main class="lg:col-span-9">
+        <!-- 公司和城市信息 -->
+        <div class="flex items-center mb-4">
+          <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm mr-2">{companyData.name}</span>
+          <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">{companyData.city}</span>
+        </div>
+        
+        <!-- 标题 -->
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-4">{companyData.title || companyData.name}</h1>
+        
+        <!-- 标签 -->
+        <div class="mb-8 warning-tags-container">
+          {companyData.tags.length > 0 ? (
+            companyData.tags.map(tag => (
+              <span class="warning-tag" key={tag}>{tag}</span>
+            ))
+          ) : (
+            <span class="text-gray-500 text-sm">暂无实锤问题标签</span>
+          )}
+        </div>
+
+        <!-- 审核公示 -->
+        <div id="audit-info" class="scroll-mt-24">
+          <AuditCard auditInfo={companyData.audit_info} />
+        </div>
+
+        <!-- 内容 -->
+        <div class="bg-white rounded-xl shadow-md p-6 mt-6">
+          <h2 class="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">详细信息</h2>
+          <div class="space-y-8">
+            <!-- 声明与承诺 -->
+            <div id="declaration" class="flex flex-col scroll-mt-24">
+              <h3 class="font-semibold text-gray-800 mb-3 flex items-center text-lg">
+                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                </svg>
+                声明与承诺
+              </h3>
+              <div class="warning-tags-container">
+                {declarationContent.length > 0 ? (
+                  declarationContent.map(declaration => (
+                    <span class="warning-tag" key={declaration}>{declaration}</span>
+                  ))
+                ) : (
+                  <span class="text-gray-500 text-sm">暂无声明与承诺</span>
+                )}
+              </div>
+            </div>
+            
+            <!-- 详细描述 -->
+            {descriptionHtml && (
+              <div id="detailed-description" class="flex flex-col scroll-mt-24">
+                <h3 class="font-semibold text-gray-800 mb-3 flex items-center text-lg">
+                  <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  详细描述
+                </h3>
+                <div class="bg-white p-6 rounded-lg border border-gray-150 shadow-sm markdown-content" set:html={descriptionHtml}>
+                </div>
+              </div>
+            )}
+            
+            <!-- 证据材料 -->
+            {evidenceHtml && (
+              <div id="evidence-materials" class="flex flex-col scroll-mt-24">
+                <h3 class="font-semibold text-gray-800 mb-3 flex items-center text-lg">
+                  <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                  </svg>
+                  证据材料
+                </h3>
+                <div class="bg-white p-6 rounded-lg border border-gray-150 shadow-sm markdown-content" set:html={evidenceHtml}>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <!-- 数据来源声明 -->
+        <div class="bg-gray-50 rounded-xl border border-gray-200 p-4 mt-6 text-sm text-gray-600 leading-relaxed">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p>
+              <strong>声明：</strong> 本文信息抓取自本项目 GitHub Issues，内容自动生成，可能会与原文存在些许差别。为确保信息准确性或参与讨论，建议您点击下方的 <span class="text-primary font-medium">"查看原始爆料"</span> 链接前往源地址查看。
+            </p>
+          </div>
+        </div>
+
+        <!-- 分享功能 -->
+        <div id="share-section" class="bg-white rounded-xl shadow-md p-6 mt-6 scroll-mt-24">
+          <h2 class="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">分享</h2>
+          <div class="flex flex-wrap gap-3 mb-6">
+            <!-- 复制链接 -->
+            <button id="copy-link" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200" title="复制链接">
+              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path>
+              </svg>
+              复制链接
+            </button>
+            
+            <!-- 二维码分享 -->
+            <button id="qr-share" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200" title="二维码分享">
+              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"></path>
+              </svg>
+              二维码分享
+            </button>
+          </div>
+          
+          <!-- 查看原始爆料和申诉按钮 -->
+          <div class="flex flex-wrap gap-4">
+            <a href={companyData.source_url} target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
+              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+              </svg>
+              查看原始爆料
+            </a>
+            <a href={companyData.report_url} target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
+              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+              </svg>
+              我要申诉
+            </a>
+          </div>
+          
+          <!-- 复制链接提示 -->
+          <div id="copy-success" class="mt-4 p-3 bg-green-100 text-green-800 rounded-md text-sm hidden">
+            链接已复制到剪贴板！
+          </div>
+        </div>
+
+        <!-- 时间信息 -->
+        <div class="bg-white rounded-xl shadow-md p-6 mt-6">
+          <h2 class="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">时间信息</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+            <div class="flex items-center">
+              <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span>创建时间: {new Date(companyData.created_at).toLocaleString('zh-CN')}</span>
+            </div>
+            <div class="flex items-center">
+              <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>更新时间: {new Date(companyData.updated_at).toLocaleString('zh-CN')}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 相关推荐 -->
+        {relatedCompanies.length > 0 && (
+          <div class="bg-white rounded-xl shadow-md p-6 mt-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200 flex items-center">
+              <svg class="w-5 h-5 text-primary mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path>
+              </svg>
+              相关推荐
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {relatedCompanies.map(company => (
+                <a href={`${config.paths.companyDetail}/${company.id}`} class="flex items-start justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 group" key={company.id}>
+                  <div class="flex-1 min-w-0">
+                    <h4 class="font-medium text-gray-800 group-hover:text-primary transition-colors truncate">{company.name}</h4>
+                    <div class="text-sm text-gray-500 mt-1 truncate">{company.city}</div>
+                    <div class="flex flex-wrap mt-2 gap-2">
+                      {company.tags.slice(0, 3).map(tag => (
+                        <span class="px-2 py-1 bg-white text-gray-700 rounded-full text-xs border border-gray-200 group-hover:bg-primary/5 group-hover:text-primary group-hover:border-primary/20 transition-all" key={tag}>{tag}</span>
+                      ))}
+                      {company.tags.length > 3 && (
+                        <span class="px-2 py-1 bg-white text-gray-700 rounded-full text-xs border border-gray-200 group-hover:bg-primary/5 group-hover:text-primary group-hover:border-primary/20 transition-all">+{company.tags.length - 3}</span>
+                      )}
+                    </div>
+                  </div>
+                  <svg class="w-5 h-5 text-gray-400 mt-1 group-hover:text-primary transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+
+      <!-- 侧边栏 - 目录 -->
+      <aside class="hidden lg:block lg:col-span-3">
+        <div class="sticky top-6">
+          <div class="bg-white rounded-xl shadow-md p-5 border border-gray-100">
+            <h3 class="font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+              </svg>
+              文章目录
+            </h3>
+            <nav id="toc" class="text-sm">
+              <ul class="space-y-3" id="toc-list">
+                <!-- 静态目录项 + 动态生成的子目录 -->
+                <li>
+                  <a href="#audit-info" class="block text-gray-600 hover:text-primary transition-colors hover:bg-gray-50 px-2 py-1 rounded">审核公示</a>
+                </li>
+                <li>
+                  <a href="#declaration" class="block text-gray-600 hover:text-primary transition-colors hover:bg-gray-50 px-2 py-1 rounded">声明与承诺</a>
+                </li>
+                {descriptionHtml && (
+                  <li>
+                    <a href="#detailed-description" class="block text-gray-600 hover:text-primary transition-colors hover:bg-gray-50 px-2 py-1 rounded">详细描述</a>
+                    <ul id="toc-description" class="pl-4 mt-2 space-y-2 border-l border-gray-100 ml-2 hidden">
+                      <!-- 动态填充子标题 -->
+                    </ul>
+                  </li>
+                )}
+                {evidenceHtml && (
+                  <li>
+                    <a href="#evidence-materials" class="block text-gray-600 hover:text-primary transition-colors hover:bg-gray-50 px-2 py-1 rounded">证据材料</a>
+                    <ul id="toc-evidence" class="pl-4 mt-2 space-y-2 border-l border-gray-100 ml-2 hidden">
+                      <!-- 动态填充子标题 -->
+                    </ul>
+                  </li>
+                )}
+                <li>
+                  <a href="#share-section" class="block text-gray-600 hover:text-primary transition-colors hover:bg-gray-50 px-2 py-1 rounded">分享</a>
+                </li>
+              </ul>
+            </nav>
+            
+            <!-- 返回顶部按钮 -->
+            <button id="back-to-top" class="mt-8 w-full flex items-center justify-center px-4 py-2 border border-gray-200 shadow-sm text-sm font-medium rounded-md text-gray-600 bg-gray-50 hover:bg-white hover:text-primary transition-all duration-200">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+              </svg>
+              返回顶部
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>  
+  <!-- 二维码分享弹窗 -->
+  <div id="qr-share-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-lg font-bold text-gray-800">二维码分享</h3>
+        <button id="close-qr-modal" class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" clip-rule="evenodd"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="text-center">
+        <p class="mb-6 text-gray-700">请使用微信或其他APP扫描二维码分享</p>
+        <div class="flex justify-center">
+          <div class="w-48 h-48 bg-gray-100 flex items-center justify-center p-3 rounded-lg">
+            <!-- 二维码容器 -->
+            <canvas id="qr-code-canvas"></canvas>
+          </div>
+        </div>
+        <p class="mt-6 text-sm text-gray-500">或者点击右上角分享给好友</p>
+      </div>
+    </div>
+  </div>
+      
+  <script>
+    // 复制链接功能
+    const copyLinkBtn = document.getElementById('copy-link');
+    const copySuccess = document.getElementById('copy-success');
+    
+    if (copyLinkBtn) {
+      copyLinkBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          copySuccess.classList.remove('hidden');
+          setTimeout(() => {
+            copySuccess.classList.add('hidden');
+          }, 2000);
+        } catch (err) {
+          // 静默处理错误
+        }
+      });
+    }
+    
+    // 二维码分享弹窗
+    const qrShareBtn = document.getElementById('qr-share');
+    const qrModal = document.getElementById('qr-share-modal');
+    const closeQrModal = document.getElementById('close-qr-modal');
+    const qrCanvas = document.getElementById('qr-code-canvas');
+    
+    // 生成二维码
+    const generateQRCode = async (url) => {
+      try {
+        // 使用动态导入 QRCode 库
+        const QRCodeModule = await import('qrcode');
+        await QRCodeModule.default.toCanvas(qrCanvas, url, {
+          width: 192,
+          margin: 1,
+          color: {
+            dark: '#000000',
+            light: '#ffffff'
+          }
+        });
+      } catch (err) {
+        // 静默处理错误
+      }
+    };
+    
+    if (qrShareBtn) {
+      qrShareBtn.addEventListener('click', () => {
+        // 生成当前页面的二维码
+        generateQRCode(window.location.href);
+        // 显示弹窗
+        qrModal.classList.remove('hidden');
+      });
+    }
+    
+    if (closeQrModal) {
+      closeQrModal.addEventListener('click', () => {
+        qrModal.classList.add('hidden');
+      });
+    }
+    
+    // 点击外部关闭弹窗
+    if (qrModal) {
+      qrModal.addEventListener('click', (e) => {
+        if (e.target === qrModal) {
+          qrModal.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+  
+  <!-- 为详细描述中的图片添加 Fancybox 支持 -->
+  <script is:inline>
+    // 页面加载后，为详细描述中的图片添加 Fancybox 支持
+    document.addEventListener('DOMContentLoaded', function() {
+      // 为详细描述中的图片添加 Fancybox 支持
+      document.querySelectorAll('.markdown-content img').forEach((img, index) => {
+        // 检查图片是否已经被包裹在链接中
+        if (img.parentElement.tagName !== 'A') {
+          // 确保图片 src 存在
+          if (img.src) {
+            // 创建一个链接包裹图片
+            const link = document.createElement('a');
+            link.href = img.src;
+            link.dataset.fancybox = 'gallery';
+            link.dataset.type = 'image';
+            link.dataset.caption = img.alt || `图片 ${index + 1}`;
+            link.className = 'fancybox-link';
+            
+            // 保存图片的父元素和兄弟元素
+            const parent = img.parentNode;
+            const nextSibling = img.nextSibling;
+            
+            // 包裹图片
+            link.appendChild(img.cloneNode(true));
+            parent.insertBefore(link, nextSibling);
+            parent.removeChild(img);
+          }
+        }
+      });
+    });
+    
+    // 目录生成和滚动高亮功能
+    document.addEventListener('DOMContentLoaded', function() {
+      // 1. 动态生成正文目录
+      const generateTocForSection = (sectionId, tocContainerId, prefix) => {
+        const section = document.getElementById(sectionId);
+        const tocContainer = document.getElementById(tocContainerId);
+        
+        if (section && tocContainer) {
+          const headers = section.querySelectorAll('h3, h4');
+          
+          if (headers.length > 0) {
+            tocContainer.classList.remove('hidden');
+            
+            headers.forEach((header, index) => {
+              // 生成并设置ID
+              const headerId = `${prefix}-${index}`;
+              header.id = headerId;
+              header.classList.add('scroll-mt-24'); // 添加滚动偏移
+              
+              // 创建目录项
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.href = `#${headerId}`;
+              a.textContent = header.textContent;
+              a.className = 'block text-gray-500 hover:text-primary transition-colors hover:bg-gray-50 px-2 py-1 rounded text-xs truncate';
+              // h4 缩进更多
+              if (header.tagName === 'H4') {
+                a.classList.add('pl-4');
+              }
+              
+              li.appendChild(a);
+              tocContainer.appendChild(li);
+            });
+          }
+        }
+      };
+      
+      generateTocForSection('detailed-description', 'toc-description', 'desc');
+      generateTocForSection('evidence-materials', 'toc-evidence', 'evid');
+      
+      // 2. 滚动监听高亮
+      const tocLinks = document.querySelectorAll('#toc a');
+      const sections = new Map();
+      
+      // 收集所有锚点对应的元素
+      tocLinks.forEach(link => {
+        const targetId = link.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          sections.set(targetId, {
+            link: link,
+            element: targetElement
+          });
+        }
+      });
+      
+      // 使用 IntersectionObserver 进行更高效的滚动监听
+      const observerOptions = {
+        root: null,
+        rootMargin: '-100px 0px -70% 0px', // 顶部偏移100px，底部只看顶部30%区域
+        threshold: 0
+      };
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // 移除所有高亮
+            tocLinks.forEach(l => {
+              l.classList.remove('text-primary', 'bg-blue-50', 'font-medium');
+              l.classList.add('text-gray-600');
+            });
+            
+            // 添加高亮到当前项
+            const activeId = entry.target.id;
+            const activeLink = document.querySelector(`#toc a[href="#${activeId}"]`);
+            if (activeLink) {
+              activeLink.classList.remove('text-gray-600', 'text-gray-500');
+              activeLink.classList.add('text-primary', 'bg-blue-50', 'font-medium');
+              
+              // 如果是子菜单项，确保父菜单也展开/高亮（可选）
+              const parentUl = activeLink.closest('ul[id^="toc-"]');
+              if (parentUl) {
+                parentUl.classList.remove('hidden');
+              }
+            }
+          }
+        });
+      }, observerOptions);
+      
+      sections.forEach(item => {
+        observer.observe(item.element);
+      });
+      
+      // 返回顶部功能
+      const backToTopBtn = document.getElementById('back-to-top');
+      if (backToTopBtn) {
+        backToTopBtn.addEventListener('click', () => {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        });
+      }
+    });
+  </script>
+</Layout>

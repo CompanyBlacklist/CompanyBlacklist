@@ -1,0 +1,79 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="联系我们 - 职场避雷针" description="欢迎联系职场避雷针平台，提出您的问题、建议或反馈">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="mb-8 text-center">联系我们</h1>
+    
+    <!-- 联系方式 -->
+    <section class="mb-12 card">
+      <h2 class="mb-4">联系方式</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="text-lg font-medium mb-3">官方渠道</h3>
+          <ul class="space-y-3 text-gray-700">
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-gray-400 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+              GitHub Issues: <a href="https://github.com/CompanyBlacklist/CompanyBlacklist/issues" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">Submit</a>
+            </li>
+
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-medium mb-3">常见问题</h3>
+          <ul class="space-y-3 text-gray-700">
+            <li class="flex items-start">
+              <svg class="w-5 h-5 text-primary mr-3 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 12 10 12-4.48 12-10S17.52 2 12 2zm1 15h-2v-2h2v2zm2.07-7.75l-1.96 2.36h-3.25L8.93 9.25c-.15-.19-.42-.19-.57 0l-1.41 1.79c-.15.19-.07.5.11.66l2.49 1.35c.2.11.42.11.61 0l5.55-2.94c.19-.1.27-.41.12-.61l-1.41-1.79c-.15-.2-.42-.2-.57 0z" clip-rule="evenodd"></path>
+              </svg>
+              <div>
+                <strong class="block">如何提交企业爆料？</strong>
+                <p class="text-sm">请通过 <a href="https://github.com/CompanyBlacklist/CompanyBlacklist/issues/new?template=report.yml" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">GitHub Issues</a> 提交，我们会在 24 小时内回复。</p>
+              </div>
+            </li>
+            <li class="flex items-start">
+              <svg class="w-5 h-5 text-primary mr-3 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 12 10 12-4.48 12-10S17.52 2 12 2zm1 15h-2v-2h2v2zm2.07-7.75l-1.96 2.36h-3.25L8.93 9.25c-.15-.19-.42-.19-.57 0l-1.41 1.79c-.15.19-.07.5.11.66l2.49 1.35c.2.11.42.11.61 0l5.55-2.94c.19-.1.27-.41.12-.61l-1.41-1.79c-.15-.2-.42-.2-.57 0z" clip-rule="evenodd"></path>
+              </svg>
+              <div>
+                <strong class="block">如何参与审核？</strong>
+                <p class="text-sm">请通过 <a href="https://github.com/CompanyBlacklist/CompanyBlacklist/issues/new?template=reviewer.yml" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">GitHub Issues</a> 申请成为审核志愿者，我们会进行审核。</p>
+              </div>
+            </li>
+            <li class="flex items-start">
+              <svg class="w-5 h-5 text-primary mr-3 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 12 10 12-4.48 12-10S17.52 2 12 2zm1 15h-2v-2h2v2zm2.07-7.75l-1.96 2.36h-3.25L8.93 9.25c-.15-.19-.42-.19-.57 0l-1.41 1.79c-.15.19-.07.5.11.66l2.49 1.35c.2.11.42.11.61 0l5.55-2.94c.19-.1.27-.41.12-.61l-1.41-1.79c-.15-.2-.42-.2-.57 0z" clip-rule="evenodd"></path>
+              </svg>
+              <div>
+                <strong class="block">如何举报不实信息？</strong>
+                <p class="text-sm">请通过 <a href="https://github.com/CompanyBlacklist/CompanyBlacklist/issues/new?template=report_false.yml" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">GitHub Issues</a> 举报，我们会进行核实。</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 联系方式 -->
+    <section class="card">
+      <h2 class="mb-4">合作与支持</h2>
+      <div class="space-y-4 text-gray-700">
+        <p>
+          职场避雷针是一个公益性质的平台，我们欢迎各种形式的合作与支持，包括但不限于：
+        </p>
+        <ul class="list-disc pl-5 space-y-2">
+          <li>技术支持与开发贡献</li>
+          <li>内容审核与运营支持</li>
+          <li>资源对接与推广合作</li>
+          <li>资金支持与捐赠</li>
+        </ul>
+        <p>
+          如果您有合作意向或其他问题，欢迎通过以上联系方式与我们取得联系。
+        </p>
+      </div>
+    </section>
+  </div>
+</Layout>

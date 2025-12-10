@@ -1,0 +1,64 @@
+name: 企业申诉
+description: 针对已公开的企业信息进行申诉
+title: "[申诉] 公司名称 - 申诉理由"
+labels: ["type:appeal"]
+body:
+  - type: input
+    id: company-id
+    attributes:
+      label: 公司ID
+      description: 请填写被申诉公司的ID（可在详情页URL中找到）
+      placeholder: 如：1001
+    validations:
+      required: true
+
+  - type: input
+    id: company-name
+    attributes:
+      label: 公司全称
+      description: 请填写完整的公司名称
+      placeholder: 如：xx科技（xx）有限公司
+    validations:
+      required: true
+
+  - type: textarea
+    id: appeal-reason
+    attributes:
+      label: 申诉理由
+      description: 请详细说明您的申诉理由，指出具体问题
+      placeholder: 请详细说明申诉理由...
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 证明材料
+      description: 请提供相关证明材料，如营业执照、整改证明、法律文书等
+      placeholder: 请提供证明材料...
+    validations:
+      required: true
+
+  - type: input
+    id: contact-info
+    attributes:
+      label: 联系方式
+      description: 请提供有效的联系方式，以便我们与您联系
+      placeholder: 如：email@example.com
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 声明与承诺
+      description: 请确认以下内容
+      options:
+        - label: 我是该公司的合法代表或授权代理人
+          required: true
+        - label: 我保证所提供的信息真实可靠
+          required: true
+        - label: 我同意公开我的 GitHub 用户名（用于身份验证）
+          required: true
+        - label: 我已阅读并同意项目的《免责声明》
+          required: true

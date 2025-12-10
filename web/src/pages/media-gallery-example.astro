@@ -1,0 +1,126 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MediaGallery from '../components/MediaGallery.astro';
+
+// 示例媒体数据
+const mediaItems = [
+  {
+    type: 'image',
+    src: 'https://picsum.photos/1200/800?random=1',
+    thumbnail: 'https://picsum.photos/400/300?random=1',
+    alt: '示例图片 1',
+    caption: '这是一张示例图片，展示了美丽的自然风光',
+    width: 1200,
+    height: 800
+  },
+  {
+    type: 'video',
+    src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    thumbnail: 'https://picsum.photos/400/300?random=2',
+    poster: 'https://picsum.photos/800/600?random=2',
+    caption: '这是一段示例视频，展示了大兔子的故事',
+    width: 1280,
+    height: 720
+  },
+  {
+    type: 'audio',
+    src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    thumbnail: 'https://picsum.photos/400/300?random=3',
+    caption: '这是一段示例音频，展示了优美的音乐',
+  },
+  {
+    type: 'image',
+    src: 'https://picsum.photos/1200/800?random=4',
+    thumbnail: 'https://picsum.photos/400/300?random=4',
+    alt: '示例图片 4',
+    caption: '这是另一张示例图片，展示了城市风景',
+    width: 1200,
+    height: 800
+  },
+  {
+    type: 'video',
+    src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    thumbnail: 'https://picsum.photos/400/300?random=5',
+    poster: 'https://picsum.photos/800/600?random=5',
+    caption: '这是另一段示例视频，展示了大象的梦想',
+    width: 1280,
+    height: 720
+  },
+  {
+    type: 'image',
+    src: 'https://picsum.photos/1200/800?random=6',
+    thumbnail: 'https://picsum.photos/400/300?random=6',
+    alt: '示例图片 6',
+    caption: '这是第三张示例图片，展示了海滩景色',
+    width: 1200,
+    height: 800
+  },
+  {
+    type: 'audio',
+    src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    thumbnail: 'https://picsum.photos/400/300?random=7',
+    caption: '这是另一段示例音频，展示了欢快的音乐',
+  },
+  {
+    type: 'image',
+    src: 'https://picsum.photos/1200/800?random=8',
+    thumbnail: 'https://picsum.photos/400/300?random=8',
+    alt: '示例图片 8',
+    caption: '这是第四张示例图片，展示了山脉景观',
+    width: 1200,
+    height: 800
+  }
+];
+---
+
+<Layout title="Media Gallery Example">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8 text-center">Media Gallery Example</h1>
+    
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">多媒体画廊演示</h2>
+      <p class="text-gray-600 mb-6">
+        这个示例展示了如何使用 MediaGallery 组件创建一个支持图片、视频和音频的多媒体画廊。
+        点击任何媒体项即可在灯箱中查看或播放。
+      </p>
+      
+      <!-- 媒体画廊组件 -->
+      <MediaGallery mediaItems={mediaItems} />
+    </div>
+    
+    <div class="bg-gray-50 p-6 rounded-lg">
+      <h2 class="text-xl font-semibold mb-4">使用说明</h2>
+      <ol class="list-decimal list-inside space-y-2 text-gray-600">
+        <li>将 <code>MediaGallery</code> 组件导入到你的页面中</li>
+        <li>准备符合 <code>MediaItem</code> 接口的媒体数据数组</li>
+        <li>将媒体数据传递给组件的 <code>mediaItems</code> 属性</li>
+        <li>组件会自动渲染响应式画廊，支持多种媒体类型</li>
+      </ol>
+      
+      <h3 class="text-lg font-semibold mt-6 mb-3">数据格式</h3>
+      <pre class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm">
+{`interface MediaItem { 
+  type: 'image' | 'video' | 'audio' 
+  src: string 
+  thumbnail: string 
+  width?: number 
+  height?: number 
+  poster?: string // 视频专用 
+  caption?: string 
+  alt?: string 
+}`}</pre>
+      
+      <h3 class="text-lg font-semibold mt-6 mb-3">功能特性</h3>
+      <ul class="list-disc list-inside space-y-1 text-gray-600">
+        <li>响应式网格布局（移动端1列，平板2列，桌面4列）</li>
+        <li>统一卡片设计：固定宽高比(4:3)，悬停动画</li>
+        <li>媒体类型标识：视频/音频显示对应图标</li>
+        <li>懒加载非首屏媒体项</li>
+        <li>支持图片、视频、音频三种媒体类型</li>
+        <li>桌面端自动显示缩略图导航</li>
+        <li>无障碍支持</li>
+        <li>移动端触摸友好</li>
+      </ul>
+    </div>
+  </div>
+</Layout>

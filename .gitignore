@@ -1,0 +1,22 @@
+# Node.js
+node_modules/
+
+# Generated Data
+
+# Flutter
+app/.dart_tool/
+app/build/
+app/.pub/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+
+# Astro
+web/dist/
+web/.astro/
+
+# docs
+localdocs/
+
+
+# ide
+.trae/

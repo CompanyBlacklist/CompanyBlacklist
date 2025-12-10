@@ -1,0 +1,167 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SearchBar from '../components/SearchBar.astro';
+import { config } from '../config.js';
+import fs from 'fs';
+import path from 'path';
+
+// 获取热榜数据
+let hotCompanies = [];
+
+// 获取统计数据
+let stats = {
+  totalCompanies: 0,
+  totalReviews: 0,
+  totalReviewers: 0,
+};
+
+try {
+    // 在构建时直接读取数据文件
+    // 从web目录向上一级到项目根目录
+    const rootPath = path.join(process.cwd(), '..');
+    
+    // 读取热榜数据
+    const hotFilePath = path.join(rootPath, 'static_api', 'v1', 'hot.json');
+    if (fs.existsSync(hotFilePath)) {
+      const hotData = fs.readFileSync(hotFilePath, 'utf8');
+      hotCompanies = JSON.parse(hotData);
+    }
+    
+    // 获取 meta 数据
+    const metaFilePath = path.join(rootPath, 'static_api', 'v1', 'meta.json');
+    if (fs.existsSync(metaFilePath)) {
+      const metaData = JSON.parse(fs.readFileSync(metaFilePath, 'utf8'));
+      stats.totalCompanies = metaData.total_count;
+    }
+    
+    // 获取审核统计数据
+    const auditFilePath = path.join(rootPath, 'static_api', 'v1', 'audit_stats.json');
+    if (fs.existsSync(auditFilePath)) {
+      const auditData = JSON.parse(fs.readFileSync(auditFilePath, 'utf8'));
+      stats.totalReviews = auditData.total_reviews;
+      stats.totalReviewers = Object.keys(auditData.reviewers).length;
+    }
+} catch (error) {
+  console.error('Error fetching data:', error);
+}
+---
+
+<Layout title="CompanyBlacklist - 职场避雷针" description="一个公益性质的企业违规行为曝光平台">
+  <div class="max-w-4xl mx-auto">
+    <!-- 标题和搜索 -->
+    <div class="text-center mb-12">
+      <h1 class="mb-4">职场避雷针</h1>
+      <p class="text-gray-600 mb-8">一个公益性质的企业违规行为曝光平台，帮助职场人士规避不良企业</p>
+      <SearchBar />
+    </div>
+
+    <!-- 数据统计 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div class="card text-center">
+        <div class="text-4xl font-bold text-primary mb-2">{stats.totalCompanies}</div>
+        <div class="text-gray-600">收录企业</div>
+      </div>
+      <div class="card text-center">
+        <div class="text-4xl font-bold text-primary mb-2">{stats.totalCompanies}</div>
+        <div class="text-gray-600">审核通过</div>
+      </div>
+      <div class="card text-center">
+        <div class="text-4xl font-bold text-primary mb-2">{stats.totalReviewers}</div>
+        <div class="text-gray-600">志愿者</div>
+      </div>
+    </div>
+
+    <!-- 热榜 -->
+    <section class="mb-12">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="flex items-center">
+          <svg class="w-6 h-6 text-primary mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M13.768 10.926l1.536 1.536a2 2 0 01-2.828 2.828l-.707-.707-4.243 4.243a2 2 0 01-2.828 0l-1.414-1.414a2 2 0 010-2.828l4.243-4.243-.707-.707a2 2 0 012.828-2.828l1.536 1.536V4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-3.232z"></path>
+          </svg>
+          热榜企业
+        </h2>
+        <span class="text-sm text-gray-500">按更新时间排序</span>
+      </div>
+      
+      <div class="h-96 overflow-y-auto pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        {hotCompanies.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {hotCompanies.map((company, index) => (
+              <a href={`${config.paths.companyDetail}/${company.id}`} class="card hover:no-underline transition-all group" key={company.id}>
+                <div class="flex flex-col h-full">
+                  <!-- 排名、企业名称和地点（第一行） -->
+                  <div class="flex items-center mb-2">
+                    <span class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold mr-2 group-hover:bg-primary/90 transition-colors">{index + 1}</span>
+                    <div class="flex items-center w-[calc(100%-2.5rem)]">
+                      <h3 class="text-lg font-medium text-gray-900 group-hover:text-primary transition-colors truncate mr-2">{company.n}</h3>
+                      <span class="text-sm text-gray-500 truncate">{company.c}</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Issues标题（第二行） -->
+                  <div class="text-sm text-gray-600 line-clamp-1 mb-2">
+                    {company.title ? company.title.replace(/^\[爆料\]\s*/, '').trim() : '暂无标题'}
+                  </div>
+                  
+                  <!-- 标签（第三行） -->
+                  <div class="flex overflow-hidden whitespace-nowrap mb-3">
+                    <div class="flex gap-2">
+                      {company.t.map((tag, tagIndex) => (
+                        <span key={tag} class="tag group-hover:bg-primary/10 group-hover:text-primary transition-colors truncate whitespace-nowrap">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <!-- 更新时间 -->
+                  <div class="mt-auto text-xs text-gray-400">
+                    更新时间: {new Date(company.u * 1000).toLocaleDateString('zh-CN')}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div class="card text-center text-gray-500">
+            <p>暂无热榜数据</p>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- 如何使用 -->
+    <section class="card">
+      <h2 class="mb-4">如何使用</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="text-center">
+          <div class="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M13 2.055A9.001 9.001 0 1021.945 11H13V2.055z"></path>
+              <path d="M11 13V2.055a9.001 9.001 0 017.945 8.945H11z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium mb-2">搜索公司</h3>
+          <p class="text-sm text-gray-600">输入公司名称或城市，快速查找相关信息</p>
+        </div>
+        <div class="text-center">
+          <div class="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"></path>
+              <path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium mb-2">查看详情</h3>
+          <p class="text-sm text-gray-600">了解公司的详细避雷信息和审核情况</p>
+        </div>
+        <div class="text-center">
+          <div class="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium mb-2">参与贡献</h3>
+          <p class="text-sm text-gray-600">提交您知道的企业违规行为，帮助更多人</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>

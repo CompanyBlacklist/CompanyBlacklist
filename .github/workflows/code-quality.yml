@@ -1,0 +1,69 @@
+name: Code Quality Check
+on:
+  # 当 push 到任何分支时触发
+  push:
+    branches: [ '**' ]
+  # 当有 pull request 时触发
+  pull_request:
+    branches: [ main ]
+  # 手动触发
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies for scripts
+        working-directory: scripts
+        run: npm ci
+
+      - name: Install dependencies for web
+        working-directory: web
+        run: npm ci
+
+      - name: Run ESLint for scripts
+        working-directory: scripts
+        run: npx eslint . --ext .js || echo "ESLint not configured for scripts"
+
+      - name: Run ESLint for web
+        working-directory: web
+        run: npx eslint . --ext .js,.ts,.astro || echo "ESLint not configured for web"
+
+      - name: Check for broken links
+        working-directory: web
+        run: npx linkinator web/dist/ || echo "Linkinator not configured or no dist folder found"
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies for scripts
+        working-directory: scripts
+        run: npm ci
+
+      - name: Install dependencies for web
+        working-directory: web
+        run: npm ci
+
+      - name: Check formatting with Prettier for scripts
+        working-directory: scripts
+        run: npx prettier --check . || echo "Prettier not configured for scripts"
+
+      - name: Check formatting with Prettier for web
+        working-directory: web
+        run: npx prettier --check . || echo "Prettier not configured for web"

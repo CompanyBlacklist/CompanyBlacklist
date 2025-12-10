@@ -1,0 +1,106 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SearchBar from '../components/SearchBar.astro';
+import { config } from '../config.js';
+import fs from 'fs';
+import path from 'path';
+
+// 获取热门公司数据
+let hotCompanies = [];
+
+try {
+  // 在构建时直接读取数据文件
+  // 从web目录向上一级到项目根目录
+  const rootPath = path.join(process.cwd(), '..');
+  
+  // 读取热榜数据
+  const hotFilePath = path.join(rootPath, 'static_api', 'v1', 'hot.json');
+  if (fs.existsSync(hotFilePath)) {
+    const hotData = fs.readFileSync(hotFilePath, 'utf8');
+    hotCompanies = JSON.parse(hotData);
+  }
+} catch (error) {
+  console.error('Error fetching data:', error);
+}
+---
+
+<Layout title="404 - 页面不存在" description="您访问的页面不存在">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-12 pt-8">
+      <div class="mb-8">
+        <svg class="w-32 h-32 text-gray-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <h1 class="text-4xl font-bold mb-4 text-gray-900">404 - 页面不存在</h1>
+      <p class="text-lg text-gray-600 mb-8">您访问的页面不存在或已被删除</p>
+      <div class="flex justify-center mb-8">
+        <a href="${config.paths.home}" class="btn btn-primary mr-4">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" clip-rule="evenodd"></path>
+          </svg>
+          返回首页
+        </a>
+        <a href="${config.paths.home}" class="btn btn-secondary">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" clip-rule="evenodd"></path>
+          </svg>
+          重新搜索
+        </a>
+      </div>
+    </div>
+    
+    <!-- 搜索框 -->
+    <div class="mb-12">
+      <h2 class="text-xl font-bold mb-4 text-center">搜索您需要的公司信息</h2>
+      <SearchBar />
+    </div>
+    
+    <!-- 热门推荐 -->
+    {hotCompanies.length > 0 && (
+      <div class="mb-12">
+        <h2 class="text-xl font-bold mb-6 flex items-center">
+          <svg class="w-6 h-6 text-primary mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M13.768 10.926l1.536 1.536a2 2 0 01-2.828 2.828l-.707-.707-4.243 4.243a2 2 0 01-2.828 0l-1.414-1.414a2 2 0 010-2.828l4.243-4.243-.707-.707a2 2 0 012.828-2.828l1.536 1.536V4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-3.232z"></path>
+          </svg>
+          热门公司推荐
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {hotCompanies.slice(0, 6).map((company, index) => (
+            <a href={`${config.paths.companyDetail}/${company.id}`} class="card hover:no-underline transition-all group" key={company.id}>
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="flex items-center mb-2">
+                    <span class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold mr-2 group-hover:bg-primary/90 transition-colors">{index + 1}</span>
+                    <h3 class="text-lg font-medium text-gray-900 group-hover:text-primary transition-colors">{company.n}</h3>
+                  </div>
+                  <div class="text-sm text-gray-500 mb-3">{company.c}</div>
+                  <div class="flex flex-wrap">
+                    {company.t.map(tag => (
+                      <span class="tag group-hover:bg-primary/10 group-hover:text-primary transition-colors" key={tag}>{tag}</span>
+                    ))}
+                  </div>
+                </div>
+                <svg class="w-5 h-5 text-gray-400 mt-1 group-hover:text-primary transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+    
+    <!-- 引导提示 -->
+    <div class="text-center py-8 border-t border-gray-100">
+      <p class="text-gray-500">
+        您可以通过以下方式获取帮助：
+      </p>
+      <div class="mt-4 flex justify-center space-x-4">
+        <a href="${config.paths.about}" class="text-primary hover:underline">关于我们</a>
+        <a href="${config.paths.contact}" class="text-primary hover:underline">联系我们</a>
+        <a href="${config.paths.disclaimer}" class="text-primary hover:underline">免责声明</a>
+      </div>
+    </div>
+  </div>
+</Layout>

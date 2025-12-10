@@ -1,0 +1,27 @@
+{
+  "name": "CompanyBlacklist-etl",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "CompanyBlacklist ETL 数据处理脚本",
+  "main": "generate_api.js",
+  "scripts": {
+    "start": "node generate_api.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "etl",
+    "CompanyBlacklist",
+    "github"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/core": "^5.0.0",
+    "@octokit/rest": "^20.0.0",
+    "bottleneck": "^2.19.5",
+    "fs-extra": "^11.1.0",
+    "marked": "^17.0.1",
+    "pinyin": "^3.0.0",
+    "sanitize-html": "^2.11.0"
+  }
+}

@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 全局样式 */
+body {
+  @apply bg-gray-50 text-gray-900 font-sans;
+}
+
+/* 标题样式 */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold text-gray-900;
+}
+
+h1 {
+  @apply text-3xl sm:text-4xl;
+}
+
+h2 {
+  @apply text-2xl sm:text-3xl;
+}
+
+h3 {
+  @apply text-xl sm:text-2xl;
+}
+
+/* 链接样式 */
+a {
+  @apply text-primary hover:underline transition-colors;
+}
+
+/* 卡片样式 */
+.card {
+  @apply bg-white rounded-lg shadow-md p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}
+
+/* 按钮样式 */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50;
+}
+
+.btn-primary {
+  @apply bg-primary text-white hover:bg-primary/90 focus:ring-primary active:scale-95;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400 active:scale-95;
+}
+
+.btn-outline {
+  @apply border border-primary text-primary hover:bg-primary/10 focus:ring-primary active:scale-95;
+}
+
+/* 标签样式 */
+.tag {
+  @apply inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-700 mr-1.5 mb-1.5 transition-all duration-200 hover:bg-primary/10 hover:text-primary;
+}
+
+/* 表单样式 */
+input, textarea, select {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary transition-all duration-200 placeholder-gray-400;
+}
+
+label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* 阴影效果 */
+.shadow-hover {
+  @apply transition-shadow duration-300 hover:shadow-lg;
+}
+
+/* 渐变背景 */
+.gradient-bg {
+  @apply bg-gradient-to-r from-primary to-primary/70;
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .container {
+    @apply px-4;
+  }
+  
+  h1 {
+    @apply text-2xl;
+  }
+  
+  h2 {
+    @apply text-xl;
+  }
+  
+  h3 {
+    @apply text-lg;
+  }
+}
+
+/* 列表样式 */
+ul, ol {
+  @apply pl-5 space-y-2;
+}
+
+ul {
+  @apply list-disc;
+}
+
+ol {
+  @apply list-decimal;
+}
+
+/* 分隔线样式 */
+.divider {
+  @apply border-t border-gray-200 my-8;
+}
+
+/* 悬浮效果 */
+.hover-lift {
+  @apply transition-transform duration-300 hover:-translate-y-1;
+}
+
+/* 文本截断 */
+.text-ellipsis {
+  @apply truncate;
+}
+
+/* 页脚链接样式 */
+footer a {
+  @apply text-gray-400 hover:text-white transition-colors duration-200;
+}

@@ -1,0 +1,125 @@
+---
+import '../styles/global.css';
+import { config } from '../config';
+
+const { title = `${config.platformName} - ${config.platformTitle}`, description = config.platformDescription } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <!-- 预加载关键字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Fancybox CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
+  
+  <!-- 移除全局图片样式，使用更具体的样式 -->
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- 头部导航 -->
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">
+          避
+        </div>
+        <a href={config.navigation.home.url} class="text-xl font-bold text-gray-900">{config.platformName}</a>
+      </div>
+      <nav class="hidden md:flex space-x-6">
+        <a href={config.navigation.home.url} class="text-gray-600 hover:text-primary font-medium">{config.navigation.home.label}</a>
+        <a href={config.navigation.about.url} class="text-gray-600 hover:text-primary font-medium">{config.navigation.about.label}</a>
+        <a href={config.navigation.stats.url} class="text-gray-600 hover:text-primary font-medium">{config.navigation.stats.label}</a>
+        <a href={config.navigation.contact.url} class="text-gray-600 hover:text-primary font-medium">{config.navigation.contact.label}</a>
+        <a href={config.navigation.disclaimer.url} class="text-gray-600 hover:text-primary font-medium">{config.navigation.disclaimer.label}</a>
+      </nav>
+      <div class="flex items-center space-x-4">
+        <a href={config.githubUrl} target="_blank" rel="noopener noreferrer" class="text-gray-600 hover:text-primary">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主要内容 -->
+  <main class="flex-1 container mx-auto px-4 py-8">
+    <slot />
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-gray-900 text-white py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <div class="flex items-center space-x-2 mb-4">
+            <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">
+              避
+            </div>
+            <h3 class="text-xl font-bold">CompanyBlacklist</h3>
+          </div>
+          <p class="text-gray-400">一个公益性质的企业违规行为曝光平台，旨在帮助职场人士规避不良企业，维护自身合法权益。</p>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">快速链接</h3>
+          <ul class="space-y-2">
+            <li><a href={config.navigation.home.url} class="text-gray-400 hover:text-white">{config.navigation.home.label}</a></li>
+            <li><a href={config.navigation.about.url} class="text-gray-400 hover:text-white">{config.navigation.about.label}</a></li>
+            <li><a href={config.navigation.stats.url} class="text-gray-400 hover:text-white">{config.navigation.stats.label}</a></li>
+            <li><a href={config.navigation.contact.url} class="text-gray-400 hover:text-white">{config.navigation.contact.label}</a></li>
+            <li><a href={config.navigation.disclaimer.url} class="text-gray-400 hover:text-white">{config.navigation.disclaimer.label}</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">贡献指南</h3>
+          <ul class="space-y-2">
+            <li><a href={config.githubUrl} target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white">GitHub 仓库</a></li>
+            <li><a href={config.reportIssueUrl} target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white">我要爆料</a></li>
+            <li><a href={config.appealIssueUrl} target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white">企业申诉</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
+        <p>&copy; {new Date().getFullYear()} CompanyBlacklist. 保留所有权利。</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Fancybox JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js" defer></script>
+  
+  <!-- Fancybox 统一初始化脚本 -->
+  <script is:inline>
+    // 确保 DOM 完全加载后初始化 Fancybox
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检查 Fancybox 是否已初始化
+      if (window.Fancybox && !window.fancyboxInitialized) {
+        // 初始化 Fancybox
+        Fancybox.bind('[data-fancybox]', {
+          // 基础配置，移除可能导致问题的详细参数
+          Toolbar: {
+            display: {
+              left: [],
+              middle: [],
+              right: ["close"],
+            },
+          },
+          Thumbs: {
+            autoStart: true,
+          },
+        });
+        
+        // 标记为已初始化
+        window.fancyboxInitialized = true;
+      }
+    });
+  </script>
+</body>
+</html>

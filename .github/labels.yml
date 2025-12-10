@@ -1,0 +1,33 @@
+# GitHub 标签配置文件
+# 用于定义所有业务流程中使用的自定义标签
+# 可通过 GitHub Actions 或手动创建这些标签
+
+# 状态类标签 - 初始状态
+- name: "status:pending"
+  color: "f9d0c4"
+  description: "信息提交后，系统自动添加的初始状态"
+
+# 状态类标签 - 需要补充信息
+- name: "status:info-needed"
+  color: "ffb100"
+  description: "初审时，若证据不足，添加此标签要求补充信息"
+
+# 审计类标签 - 初审通过
+- name: "audit:verified"
+  color: "2ea043"
+  description: "初审志愿者确认信息属实，添加此蓝色标签"
+
+# 状态类标签 - 被拒绝
+- name: "status:rejected"
+  color: "b60205"
+  description: "初审或终审时，若信息违规/恶意，添加此标签并关闭 Issue"
+
+# 管理员类标签 - 终审通过
+- name: "admin:approved"
+  color: "0e8a16"
+  description: "终审管理员确认无误，添加此绿色标签，触发 GitHub Actions 抓取数据"
+
+# 类型类标签 - 申诉
+- name: "type:appeal"
+  color: "006b75"
+  description: "用户提交的申诉，自动添加此标签"

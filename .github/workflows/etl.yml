@@ -1,0 +1,77 @@
+name: ETL Data Processing
+on:
+  # 定时运行，每4小时执行一次
+  schedule:
+    - cron: '0 */4 * * *'
+  # 手动触发
+  workflow_dispatch:
+  # 当 ETL 脚本或配置文件更改时触发
+  push:
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/etl.yml'
+
+jobs:
+  etl:
+    runs-on: ubuntu-latest
+    permissions:
+      # 允许写入仓库内容（包含read权限）
+      contents: write
+      # 允许访问 issues
+      issues: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: scripts/package-lock.json
+
+      - name: Install dependencies
+        working-directory: scripts
+        run: npm ci
+
+      - name: Run ETL script
+        working-directory: scripts
+        env:
+          # GitHub API Token，用于访问 GitHub Issues
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # ETL 配置
+          GITHUB_OWNER: CompanyBlacklist
+          GITHUB_REPO: CompanyBlacklist
+        run: npm start
+
+      - name: Upload generated API data
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-api-data
+          path: static_api/
+          if-no-files-found: error
+
+      - name: Commit and push generated data
+        run: |
+          # 配置 Git 信息
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # 检查是否有更改
+          git status
+          
+          # 添加更改的文件
+          git add static_api/
+          
+          # 检查是否有更改需要提交
+          if git diff --cached --quiet; then
+            echo "No changes to commit, skipping commit and push"
+            exit 0
+          else
+            # 提交更改
+            git commit -m "Update static API data via GitHub Actions"
+            
+            # 推送更改
+            git push origin ${{ github.ref }}
+          fi
+        continue-on-error: true

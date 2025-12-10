@@ -1,0 +1,66 @@
+name: Check Sensitive Labels
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  check-sensitive-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if sensitive label was added by non-admin
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // 定义敏感标签列表
+            const sensitiveLabels = ['admin:approved'];
+            
+            // 定义管理员团队名称
+            const adminTeam = 'admins';
+            
+            // 获取事件信息
+            const { issue, label, sender } = context.payload;
+            const { owner, repo } = context.repo;
+            
+            // 检查是否添加了敏感标签
+            if (sensitiveLabels.includes(label.name)) {
+              console.log(`检测到添加敏感标签: ${label.name} 由 ${sender.login} 添加`);
+              
+              try {
+                // 获取发送者所属团队
+                const response = await github.rest.teams.listForUserInOrg({
+                  username: sender.login,
+                  org: owner
+                });
+                
+                const senderTeams = response.data;
+                console.log(`发送者所属团队: ${senderTeams.map(team => team.slug).join(', ')}`);
+                
+                // 检查发送者是否属于管理员团队
+                const isAdmin = senderTeams.some(team => team.slug === adminTeam);
+                
+                if (!isAdmin) {
+                  console.log(`${sender.login} 不是管理员团队成员，移除敏感标签`);
+                  
+                  // 移除敏感标签
+                  await github.rest.issues.removeLabel({
+                    owner,
+                    repo,
+                    issue_number: issue.number,
+                    name: label.name
+                  });
+                  
+                  // 添加评论通知
+                  await github.rest.issues.createComment({
+                    owner,
+                    repo,
+                    issue_number: issue.number,
+                    body: `@${sender.login} 您好，标签 \`${label.name}\` 是敏感标签，仅管理员可使用。该标签已被移除。`
+                  });
+                } else {
+                  console.log(`${sender.login} 是管理员团队成员，允许添加敏感标签`);
+                }
+              } catch (error) {
+                console.error('处理敏感标签时出错:', error);
+              }
+            }

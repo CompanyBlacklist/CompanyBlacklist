@@ -1,0 +1,28 @@
+{
+  "id": 4,
+  "name": "测试网络科技有限公司",
+  "city": "北京",
+  "tags": [
+    "强制加班（996/007/其他？）",
+    "拖欠工资/奖金",
+    "裁员不赔偿",
+    "职场PUA/精神压迫"
+  ],
+  "title": "测试网络科技有限公司 北京 大厂裁员纠纷",
+  "body_html": "<h3>公司全称</h3>\n<p>测试网络科技有限公司</p>\n<h3>所在城市</h3>\n<p>北京</p>\n<h3>问题标签</h3>\n<ul>\n<li> 强制加班（996/007/其他？）</li>\n<li> 拖欠工资/奖金</li>\n<li> 裁员不赔偿</li>\n<li> 职场PUA/精神压迫</li>\n</ul>\n<h3>详细描述</h3>\n<h3>事件经过</h3>\n<p>2024年10月，公司以“业务调整”为由通知整个部门解散。</p>\n<ol>\n<li><strong>拒绝 N+1</strong>：HR 明确表示公司没钱，只能给 0.5 个月赔偿，还要分期。</li>\n<li><strong>威胁恐吓</strong>：在谈话室里关了两个小时，HR 原话：“如果你现在不签主动离职，下家背调的时候别怪我们不配合。”</li>\n<li><strong>锁权限</strong>：谈话还没结束，飞书和内网权限已经被切断，无法备份个人资料。</li>\n</ol>\n<p><strong>避雷点</strong>：千万别去他们的电商研发部！</p>\n<h3>证据材料</h3>\n<p><a href=\"https://example.com/audio\">录音文字版链接</a>\n<img /></p>\n<blockquote>\n<p>附件为离职协议书截图，条款极其霸王。</p>\n</blockquote>\n<p><img /></p>\n<blockquote>\n<p>附件为离职协议书截图，条款极其霸王。</p>\n</blockquote>\n<p><img /></p>\n<h3>声明与承诺</h3>\n<ul>\n<li> 我保证所提供的信息真实可靠</li>\n<li> 我同意公开我的 GitHub 用户名（用于身份验证）</li>\n<li> 我已阅读并同意项目的《免责声明》</li>\n</ul>\n",
+  "raw_body": "### 公司全称\n\n测试网络科技有限公司\n\n### 所在城市\n\n北京\n\n### 问题标签\n\n- [x] 强制加班（996/007/其他？）\n- [x] 拖欠工资/奖金\n- [x] 裁员不赔偿\n- [x] 职场PUA/精神压迫\n- [ ] 社保公积金违规\n- [ ] 试用期违规\n- [ ] 职场歧视（性别/年龄/地域等）\n- [ ] 虚假招聘\n- [ ] 竞业协议违规\n- [ ] 强迫辞职\n- [ ] 不提供离职证明\n- [ ] 劳动保护缺失\n- [ ] 培训费用陷阱\n- [ ] 其他问题\n\n### 详细描述\n\n### 事件经过\n2024年10月，公司以“业务调整”为由通知整个部门解散。\n1. **拒绝 N+1**：HR 明确表示公司没钱，只能给 0.5 个月赔偿，还要分期。\n2. **威胁恐吓**：在谈话室里关了两个小时，HR 原话：“如果你现在不签主动离职，下家背调的时候别怪我们不配合。”\n3. **锁权限**：谈话还没结束，飞书和内网权限已经被切断，无法备份个人资料。\n\n**避雷点**：千万别去他们的电商研发部！\n\n### 证据材料\n\n[录音文字版链接](https://example.com/audio)\n![谈话室照片](https://via.placeholder.com/300x200?text=Chat+Log)\n> 附件为离职协议书截图，条款极其霸王。\n\n![Image](https://github.com/user-attachments/assets/af082a18-51a6-4687-91aa-c9a8bcf7b6a5)\n\n> 附件为离职协议书截图，条款极其霸王。\n\n![Image](https://github.com/user-attachments/assets/04bd956b-c4de-4e5d-af37-5b2e9e230afc)\n\n### 声明与承诺\n\n- [x] 我保证所提供的信息真实可靠\n- [x] 我同意公开我的 GitHub 用户名（用于身份验证）\n- [x] 我已阅读并同意项目的《免责声明》",
+  "images": [
+    "https://via.placeholder.com/300x200?text=Chat+Log",
+    "https://github.com/user-attachments/assets/af082a18-51a6-4687-91aa-c9a8bcf7b6a5",
+    "https://github.com/user-attachments/assets/04bd956b-c4de-4e5d-af37-5b2e9e230afc"
+  ],
+  "audit_info": {
+    "first_reviewer": "OpenBlacklist",
+    "final_reviewer": "OpenBlacklist",
+    "approved_at": "2025-12-08T18:23:58Z"
+  },
+  "source_url": "https://github.com/CompanyBlacklist/CompanyBlacklist/issues/4",
+  "report_url": "https://github.com/OpenBlacklist/CompanyBlacklist/issues/new?template=appeal.yml&title=[申诉] 测试网络科技有限公司 北京 大厂裁员纠纷 - &body=公司ID: 4",
+  "created_at": "2025-12-08T18:23:48Z",
+  "updated_at": "2025-12-08T18:24:14Z"
+}
