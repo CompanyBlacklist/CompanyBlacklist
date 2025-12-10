@@ -44,6 +44,13 @@ jobs:
           GITHUB_REPO: CompanyBlacklist
         run: npm start
 
+      - name: Debug - List generated files
+        run: |
+          echo "Checking static_api directory..."
+          ls -la static_api/v1/ || echo "Directory not found"
+          echo "Checking scripts/static_api directory..."
+          ls -la scripts/static_api/v1/ 2>/dev/null || echo "Not found in scripts/"
+
       - name: Upload generated API data
         uses: actions/upload-artifact@v4
         with:

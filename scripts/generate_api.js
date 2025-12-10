@@ -34,8 +34,8 @@ const CONFIG = {
     MIN_TIME: parseInt(process.env.RATE_LIMIT_MIN_TIME || '1000'), // 毫秒
   },
 
-  // 数据存储路径
-  API_BASE_PATH: process.env.API_BASE_PATH || './static_api/v1',
+  // 数据存储路径 (相对于 scripts/ 目录，向上一级到项目根目录)
+  API_BASE_PATH: process.env.API_BASE_PATH || '../static_api/v1',
 
   // 热榜数量
   HOT_LIST_SIZE: parseInt(process.env.HOT_LIST_SIZE || '50'),
