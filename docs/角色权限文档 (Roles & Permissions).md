@@ -21,30 +21,44 @@
   * Comment: 在 Issue 下参与讨论或补充证据。  
 * **限制**: 无法打标签，无法关闭非自己创建的 Issue。
 
-### **2.2 初审志愿者 (Moderators)**
+### **2.2 初审志愿者 (Volunteers)**
 
-* **GitHub Team**: @OpenBlacklist/Mods  
+* **GitHub Team**: @CompanyBlacklist/volunteers  
 * **仓库权限**: **Triage** (分类权限)  
 * **职责**:  
   1. **每日巡查**: 检查 status:pending 的新 Issue。  
   2. **证据核实**: 确认爆料内容是否包含有效证据（聊天记录、判决书等）。  
-  3. **打标签**:  
-     * 证据确凿 \-\> 打上 audit:verified (初审通过)。  
-     * 证据不足 \-\> 打上 status:info-needed 并评论引导补充。  
-     * 恶意捣乱 \-\> 打上 status:rejected 并关闭 Issue。  
-* **安全限制**: **无法** 推送代码、合并 PR 或修改 .github/ 目录下的配置。
+  3. **打标签 (只负责初审)**:  
+     * 证据确凿 \-\> 打上 `audit:verified` (初审通过)。  
+     * 证据不足 \-\> 打上 `status:info-needed` 并评论引导补充。  
+     * 恶意捣乱 \-\> 打上 `status:rejected` 并关闭 Issue。  
+  4. **申诉初审**: 处理 type:appeal，打上 `appeal:verified` (申诉初审通过)。
+* **安全限制**: 
+  * **无法** 添加 `admin:approved`、`appeal:approved` 标签（工作流自动拦截）。
+  * **无法** 推送代码、合并 PR 或修改 .github/ 目录下的配置。
 
-### **2.3 管理员 (Admins)**
+### **2.3 终审管理员 (Admins)**
 
-* **GitHub Team**: @OpenBlacklist/Admins  
-* **仓库权限**: **Maintain** 或 **Admin**  
+* **GitHub Team**: @CompanyBlacklist/admins  
+* **仓库权限**: **Triage** (与志愿者相同，通过工作流区分权限)  
+* **职责 (只负责终审)**:  
+  1. **终审**: 复核带有 audit:verified 的 Issue，打上 `admin:approved` (触发上线)。  
+  2. **申诉裁决**: 处理 type:appeal，打上 `appeal:approved` (触发文章删除)。  
+  3. **团队管理**: 邀请或移除志愿者。
+* **安全限制**: 
+  * **无法** 添加 `audit:verified`、`appeal:verified` 标签（由志愿者负责初审）。
+  * **无法** 处理 Bug 反馈（由开发者负责）。
+
+### **2.4 开发者 (Developers)**
+
+* **GitHub Team**: @CompanyBlacklist/developers  
+* **仓库权限**: **Maintain**  
 * **职责**:  
-  1. **终审**: 复核带有 audit:verified 的 Issue，打上 admin:approved (触发上线)。  
-  2. **申诉裁决**: 处理 type:appeal，决定是否移除已上线的 admin:approved 标签。  
-  3. **代码维护**: 审核并合并 Pull Requests，维护 ETL 脚本和 Web 前端代码。  
-  4. **团队管理**: 邀请或移除志愿者。
+  1. **代码维护**: 审核并合并 Pull Requests，维护 ETL 脚本和 Web 前端代码。  
+  2. **Bug 处理**: 处理 `type:bug` Issue，添加 `bug:confirmed`、`bug:fixed` 标签。  
+  3. **工作流维护**: 维护 GitHub Actions 工作流。
 
-### **2.4 自动化机器人 (ETL Bot)**
+### **2.5 自动化机器人 (ETL Bot)**
 
 * **身份**: github-actions\[bot\] (默认) 或 专用的 Bot 账号  
 * **权限**: **Write** (需在 Settings 中配置)  
@@ -52,6 +66,7 @@
   * 执行 ETL 脚本。  
   * 自动推送生成的 JSON 到 gh-pages 分支。  
   * 自动识别重复申诉并关闭 Issue。
+  * **申诉成功处理**: 当申诉 Issue 同时拥有 `appeal:verified` + `appeal:approved` 标签时，自动删除对应公司数据。
 
 ## **3\. 权限配置操作指南 (Configuration Guide)**
 
@@ -74,21 +89,33 @@
 ### **3.3 标签权限说明 (Label Permissions)**
 
 * GitHub 目前不支持对特定 Label 设置权限（即谁能打什么标签）。  
-* **解决方案**: 依靠 **ETL 脚本逻辑**。  
-  * ETL 脚本会检查 audit:verified 是否存在。虽然 Triage 用户可以打 admin:approved 标签（GitHub 限制），但我们的流程规定管理员才打这个。  
-  * *进阶风控*: 可以在 ETL 脚本中通过 API 检查 admin:approved 标签**实际上是谁打的**。如果发现是非 Admin 组的用户打的，脚本可以自动移除该标签并报警。
+* **解决方案**: **GitHub Actions 工作流自动拦截**。  
+  * `.github/workflows/check-labels.yml` 会自动检查标签添加者的团队归属。
+  * 如果非授权团队成员添加了受保护标签，工作流会自动移除该标签并发评论通知。
+
+**标签权限映射**:
+
+| 标签 | 允许的团队 |
+|------|-------------|
+| `audit:verified` | volunteers |
+| `admin:approved` | admins |
+| `appeal:verified` | volunteers |
+| `appeal:approved` | admins |
+| `type:bug`, `bug:*` | developers |
 
 ## **4\. 权限矩阵 (Permission Matrix)**
 
-| 操作 / 资源 | Public | @Mods (Triage) | @Admins (Admin) | Actions Bot |
-| :---- | :---- | :---- | :---- | :---- |
-| **提交爆料/申诉** | ✅ | ✅ | ✅ | ❌ |
-| **评论 Issue** | ✅ | ✅ | ✅ | ✅ |
-| **打标签 (Label)** | ❌ | ✅ | ✅ | ✅ |
-| **关闭他人 Issue** | ❌ | ✅ | ✅ | ✅ |
-| **修改代码 (/scripts)** | ❌ | ❌ (被 CODEOWNERS 拦截) | ✅ | ❌ |
-| **Push 到 gh-pages** | ❌ | ❌ | ✅ | ✅ |
-| **添加/移除成员** | ❌ | ❌ | ✅ | ❌ |
+| 操作 / 资源 | Public | @volunteers (Triage) | @admins (Triage) | @developers (Maintain) | Actions Bot |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **提交爆料/申诉** | ✅ | ✅ | ✅ | ✅ | ❌ |
+| **评论 Issue** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **初审标签 (audit:verified)** | ❌ | ✅ | ❌ | ❌ | ❌ |
+| **终审标签 (admin:approved)** | ❌ | ❌ | ✅ | ❌ | ❌ |
+| **Bug 标签** | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **关闭他人 Issue** | ❌ | ✅ | ✅ | ✅ | ✅ |
+| **修改代码 (/scripts)** | ❌ | ❌ (CODEOWNERS) | ❌ (CODEOWNERS) | ✅ | ❌ |
+| **合并 PR** | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **添加/移除成员** | ❌ | ❌ | ✅ | ❌ | ❌ |
 
 ## **5\. 紧急响应流程 (Emergency Protocols)**
 

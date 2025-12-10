@@ -20,9 +20,9 @@ npm install
 
 \# 设置环境变量 (需要 GitHub Token 以访问 API)  
 \# Windows (PowerShell)  
-$env:GITHUB\_TOKEN="你的\_PAT\_TOKEN"; $env:REPO\_OWNER="CompanyBlacklist"; $env:REPO\_NAME="CompanyBlacklist"; node generate\_api.js  
+$env:GITHUB\_TOKEN="你的\_PAT\_TOKEN"; $env:GITHUB\_OWNER="CompanyBlacklist"; $env:GITHUB\_REPO="CompanyBlacklist"; node generate\_api.js  
 \# Mac/Linux  
-GITHUB\_TOKEN="你的\_PAT\_TOKEN" REPO\_OWNER="CompanyBlacklist" REPO\_NAME="CompanyBlacklist" node generate\_api.js
+GITHUB\_TOKEN="你的\_PAT\_TOKEN" GITHUB\_OWNER="CompanyBlacklist" GITHUB\_REPO="CompanyBlacklist" node generate\_api.js
 
 *运行成功后，检查根目录下的 static\_api/v1/ 是否生成了 JSON 文件。*
 
@@ -57,7 +57,7 @@ flutter build apk \--release
 
 本项目完全依赖 **GitHub Actions** 进行持续集成与部署。我们设计了两个独立的 Workflow 以分离关注点。
 
-### **2.1 核心流水线: ETL & Web Deploy (etl\_and\_web.yml)**
+### **2.1 核心流水线: ETL & Web Deploy (etl.yml 和 web-deploy.yml)**
 
 这是系统的“心脏”，负责数据更新和网站发布。
 

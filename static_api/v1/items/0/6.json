@@ -20,10 +20,11 @@
   "audit_info": {
     "first_reviewer": "OpenBlacklist",
     "final_reviewer": "OpenBlacklist",
-    "approved_at": "2025-12-09T02:37:46Z"
+    "approved_at": "2025-12-09T02:37:46Z",
+    "publisher": "OpenBlacklist"
   },
   "source_url": "https://github.com/CompanyBlacklist/CompanyBlacklist/issues/6",
-  "report_url": "https://github.com/OpenBlacklist/CompanyBlacklist/issues/new?template=appeal.yml&title=[申诉] 恶意PIP（绩效改进计划）变相裁员 - &body=公司ID: 6",
+  "report_url": "https://github.com/CompanyBlacklist/CompanyBlacklist/issues/new?template=appeal.yml&title=[申诉] 测试未来信息技术有限公司 - 上海&body=公司ID: 6",
   "created_at": "2025-12-09T02:37:29Z",
   "updated_at": "2025-12-09T02:37:46Z"
 }

@@ -20,11 +20,11 @@
   "audit_info": {
     "first_reviewer": "OpenBlacklist",
     "final_reviewer": "OpenBlacklist",
-    "publisher": "admin",
-    "approved_at": "2025-12-09T02:40:08Z"
+    "approved_at": "2025-12-09T02:40:08Z",
+    "publisher": "OpenBlacklist"
   },
   "source_url": "https://github.com/CompanyBlacklist/CompanyBlacklist/issues/7",
-  "report_url": "https://github.com/OpenBlacklist/CompanyBlacklist/issues/new?template=appeal.yml&title=[申诉] 名为“组织架构调整”，实为逼人离职，全员被强制要求去邻省办公 - &body=公司ID: 7",
+  "report_url": "https://github.com/CompanyBlacklist/CompanyBlacklist/issues/new?template=appeal.yml&title=[申诉] 虚拟联合实业集团 - 广州&body=公司ID: 7",
   "created_at": "2025-12-09T02:40:01Z",
   "updated_at": "2025-12-09T02:40:08Z"
 }

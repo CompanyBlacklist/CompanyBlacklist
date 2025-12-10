@@ -68,16 +68,18 @@ interface CompanyDetail {
   name: string;           // 公司全称  
   city: string;           // 城市  
   tags: string\[\];         // 标签  
+  title: string;          // 爆料标题 (来自 Issue 标题)
     
   // 内容部分  
-  // 内容部分  
   body\_html: string;      // 经过 sanitize-html 清洗的安全 HTML (移除 script/iframe/style)，并已自动脱敏 (隐藏手机号/身份证)。  
+  raw\_body: string;       // 原始 Markdown 内容 (用于前端二次渲染)
   images: string\[\];       // 从正文中提取的图片 URL 列表  
     
   // 审计公示 (Transparency)  
   audit\_info: {  
     first\_reviewer: string; // 初审志愿者 GitHub ID  
     final\_reviewer: string; // 终审管理员 GitHub ID  
+    publisher: string;      // 爆料人 GitHub ID (Issue 创建者)
     approved\_at: string;    // ISO 时间戳  
   };  
     

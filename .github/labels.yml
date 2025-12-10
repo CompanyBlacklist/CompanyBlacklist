@@ -31,3 +31,33 @@
 - name: "type:appeal"
   color: "006b75"
   description: "用户提交的申诉，自动添加此标签"
+
+# 类型类标签 - Bug 反馈
+- name: "type:bug"
+  color: "d73a4a"
+  description: "网站或功能的 Bug 反馈"
+
+# 类型类标签 - Bug 已确认
+- name: "bug:confirmed"
+  color: "fbca04"
+  description: "Bug 已确认，等待修复"
+
+# 类型类标签 - Bug 已修复
+- name: "bug:fixed"
+  color: "0e8a16"
+  description: "Bug 已修复，等待验证"
+
+# 申诉审核标签 - 初审通过
+- name: "appeal:verified"
+  color: "2ea043"
+  description: "初审志愿者确认申诉成立"
+
+# 申诉审核标签 - 终审通过 (触发文章删除)
+- name: "appeal:approved"
+  color: "0e8a16"
+  description: "终审管理员确认申诉成立，触发文章删除"
+
+# 类型类标签 - 举报工作人员
+- name: "type:report-staff"
+  color: "b60205"
+  description: "举报志愿者或管理员的不当行为"

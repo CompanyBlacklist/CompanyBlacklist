@@ -25,7 +25,7 @@ const logger = {
 // 配置参数
 const CONFIG = {
   // GitHub 仓库信息
-  OWNER: process.env.GITHUB_OWNER || 'OpenBlacklist',
+  OWNER: process.env.GITHUB_OWNER || 'CompanyBlacklist',
   REPO: process.env.GITHUB_REPO || 'CompanyBlacklist',
 
   // API 限速配置
@@ -35,7 +35,7 @@ const CONFIG = {
   },
 
   // 数据存储路径
-  API_BASE_PATH: process.env.API_BASE_PATH || '../static_api/v1',
+  API_BASE_PATH: process.env.API_BASE_PATH || './static_api/v1',
 
   // 热榜数量
   HOT_LIST_SIZE: parseInt(process.env.HOT_LIST_SIZE || '50'),
@@ -201,6 +201,49 @@ const isAppealSpam = (appealIssues, newAppeal) => {
 
   // 如果相同公司的申诉数量超过 2 个，则认为是恶意刷申
   return sameCompanyAppeals.length >= 2;
+};
+
+/**
+ * 检查申诉是否成功 (同时拥有 appeal:verified 和 appeal:approved 标签)
+ * @param {Object} issue - GitHub Issue 对象
+ * @returns {boolean} 是否是成功的申诉
+ */
+const isAppealSuccessful = (issue) => {
+  return hasTag(issue, 'appeal:verified') && hasTag(issue, 'appeal:approved');
+};
+
+/**
+ * 从申诉 Issue 中提取被申诉的公司 ID
+ * @param {Object} issue - 申诉 Issue
+ * @returns {number|null} 公司 ID 或 null
+ */
+const extractCompanyIdFromAppeal = (issue) => {
+  // 尝试从标题中提取：[申诉] xxx - 公司ID: 123 或 公司ID 123
+  const titleMatch = issue.title.match(/公司ID[:：]?\s*(\d+)/i);
+  if (titleMatch) {
+    return parseInt(titleMatch[1], 10);
+  }
+
+  // 尝试从正文中提取
+  // GitHub Issue 表单格式：
+  // ### 公司ID
+  // 
+  // 123
+  if (issue.body) {
+    // 匹配表单格式：### 公司ID\n\n123
+    const formMatch = issue.body.match(/###\s*公司ID\s*\n+(\d+)/i);
+    if (formMatch) {
+      return parseInt(formMatch[1], 10);
+    }
+
+    // 兜底：直接匹配 公司ID: 123 格式
+    const bodyMatch = issue.body.match(/公司ID[:：]?\s*(\d+)/i);
+    if (bodyMatch) {
+      return parseInt(bodyMatch[1], 10);
+    }
+  }
+
+  return null;
 };
 
 /**
@@ -617,19 +660,30 @@ async function main() {
       let hasMore = true;
 
       logger.info(`Fetching issues since ${since}...`);
+      console.log(`[DEBUG] API params: owner=${CONFIG.OWNER}, repo=${CONFIG.REPO}, since=${since}`);
 
       while (hasMore) {
         try {
           const response = await limiter.schedule(async () => {
-            return await octokit.issues.listForRepo({
+            // Only include 'since' if it's not the epoch date (for full refresh)
+            const params = {
               owner: CONFIG.OWNER,
               repo: CONFIG.REPO,
-              since: since,
               state: 'all',
               per_page: 100,
               page: page,
-            });
+            };
+            // Only add since if it's a real date (not epoch)
+            if (since && !since.startsWith('1970')) {
+              params.since = since;
+            }
+            return await octokit.issues.listForRepo(params);
           });
+
+          console.log(`[DEBUG] Page ${page} returned ${response.data.length} issues`);
+          if (response.data.length > 0) {
+            console.log(`[DEBUG] First issue: #${response.data[0].number} - ${response.data[0].title}`);
+          }
 
           allIssues = allIssues.concat(response.data);
           hasMore = response.data.length === 100;
@@ -638,6 +692,7 @@ async function main() {
           logger.debug(`Fetched ${allIssues.length} issues so far...`);
         } catch (error) {
           logger.error(`Failed to fetch issues on page ${page}:`, error);
+          console.log(`[DEBUG] Error details:`, error.message, error.status);
           hasMore = false;
         }
       }
@@ -665,6 +720,24 @@ async function main() {
           logger.error(`Failed to close spam appeal #${appeal.number}:`, error);
         }
       }
+    }
+
+    // 处理成功的申诉 - 收集需要删除的公司 ID
+    const companyIdsToDelete = new Set();
+    for (const appeal of appealIssues) {
+      if (isAppealSuccessful(appeal)) {
+        const companyId = extractCompanyIdFromAppeal(appeal);
+        if (companyId) {
+          companyIdsToDelete.add(companyId);
+          logger.info(`Appeal #${appeal.number} approved - marking company ID ${companyId} for deletion`);
+        } else {
+          logger.error(`Could not extract company ID from successful appeal #${appeal.number}`);
+        }
+      }
+    }
+
+    if (companyIdsToDelete.size > 0) {
+      logger.info(`Companies to be deleted due to successful appeals: ${Array.from(companyIdsToDelete).join(', ')}`);
     }
 
     // 获取所有有效 Issue 的完整数据
@@ -745,6 +818,30 @@ async function main() {
     // 2. 更新现有数据或添加新数据
     for (const companyData of processedIssues) {
       existingData.set(companyData.id, companyData);
+    }
+
+    // 2.5 删除因申诉成功而需要移除的公司
+    if (companyIdsToDelete.size > 0) {
+      logger.info('Deleting companies due to successful appeals...');
+      for (const companyId of companyIdsToDelete) {
+        // 从 existingData 中移除
+        if (existingData.has(companyId)) {
+          existingData.delete(companyId);
+          logger.info(`Removed company ID ${companyId} from data`);
+        }
+
+        // 删除对应的 JSON 文件
+        const prefix = Math.floor(companyId / 100);
+        const filePath = path.join(itemsDir, prefix.toString(), `${companyId}.json`);
+        try {
+          await fs.remove(filePath);
+          logger.info(`Deleted file: ${filePath}`);
+        } catch (error) {
+          // 文件可能不存在，忽略错误
+          logger.debug(`File not found or could not be deleted: ${filePath}`);
+        }
+      }
+      logger.info(`Deleted ${companyIdsToDelete.size} companies due to successful appeals`);
     }
 
     // 3. 处理现有数据，重新应用新的解析逻辑

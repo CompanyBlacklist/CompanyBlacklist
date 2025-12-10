@@ -4,34 +4,43 @@
 
 ### 1.1 团队结构
 
-| 团队名称 | 权限级别 | 成员类型 | 可使用标签 |
+| 团队名称 | GitHub 权限 | 职责 | 可使用标签 |
 |---------|---------|---------|-----------|
-| `@OpenBlacklist/Volunteers` | 志愿者权限 | 普通志愿者 | `status:info-needed`, `audit:verified`, `status:rejected` |
-| `@OpenBlacklist/Admins` | 管理员权限 | 管理员 | 所有标签，包括 `admin:approved` |
+| `@CompanyBlacklist/volunteers` | `triage` | 初审志愿者 | `audit:verified`, `appeal:verified`, `status:*` |
+| `@CompanyBlacklist/admins` | `triage` | 终审管理员 | `admin:approved`, `appeal:approved`, `status:*` |
+| `@CompanyBlacklist/developers` | `maintain` | 开发者 | `type:bug`, `bug:confirmed`, `bug:fixed` |
+
+> ⚠️ **重要**: 初审只能由 **volunteers** 进行，终审只能由 **admins** 进行，各自只能添加自己负责的标签。
 
 ### 1.2 权限划分
 
-#### 普通志愿者权限
+#### 初审志愿者 (volunteers)
 - 可以查看和评论所有 Issues
-- 可以添加/删除 `status:info-needed`, `audit:verified`, `status:rejected` 标签
-- 可以关闭违规/恶意的 Issues
-- 不能添加/删除 `admin:approved` 标签
+- **只能** 添加初审标签：`audit:verified`、`appeal:verified`
+- 可以添加状态标签：`status:info-needed`、`status:rejected`
+- **不能** 添加终审标签：`admin:approved`、`appeal:approved`
 
-#### 管理员权限
-- 拥有普通志愿者的所有权限
-- 可以添加/删除所有标签，包括 `admin:approved`
-- 可以触发 GitHub Actions 工作流
-- 可以管理团队成员和权限
+#### 终审管理员 (admins)
+- 可以查看和评论所有 Issues
+- **只能** 添加终审标签：`admin:approved`、`appeal:approved`
+- **不能** 添加初审标签（由志愿者负责）
+- 可以处理申诉并触发文章删除
+
+#### 开发者 (developers)
+- 审核和合并 Pull Requests
+- 处理 Bug 反馈：`type:bug`、`bug:confirmed`、`bug:fixed`
+- 维护代码和工作流
 
 ### 1.3 敏感标签限制
 
 | 标签名 | 敏感级别 | 允许使用的团队 | 说明 |
 |-------|---------|---------------|------|
 | `status:pending` | 低 | 系统自动添加 | 无需手动添加 |
-| `status:info-needed` | 低 | `@OpenBlacklist/Volunteers`, `@OpenBlacklist/Admins` | 普通志愿者和管理员均可使用 |
-| `audit:verified` | 中 | `@OpenBlacklist/Volunteers`, `@OpenBlacklist/Admins` | 普通志愿者和管理员均可使用 |
-| `status:rejected` | 中 | `@OpenBlacklist/Volunteers`, `@OpenBlacklist/Admins` | 普通志愿者和管理员均可使用 |
-| `admin:approved` | 高 | `@OpenBlacklist/Admins` | 仅管理员可使用，触发数据抓取 |
+| `audit:verified` | **高** | **volunteers 专属** | 初审通过，等待终审 |
+| `admin:approved` | **高** | **admins 专属** | 终审通过，触发数据抓取 |
+| `appeal:verified` | **高** | **volunteers 专属** | 申诉初审通过 |
+| `appeal:approved` | **高** | **admins 专属** | 申诉终审通过，触发文章删除 |
+| `type:bug` | 中 | **developers 专属** | Bug 反馈 |
 | `type:appeal` | 低 | 系统自动添加 | 无需手动添加 |
 
 ## 2. 标签使用指南
@@ -133,11 +142,12 @@ A: 联系现有管理员，说明请求理由，提供相关经验和资质证�
 
 ## 7. 联系方式
 
-- issues: [CompanyBlacklist/CompanyBlacklist](https://github.com/CompanyBlacklist/CompanyBlacklist/issues)
-- **文档更新**：如发现文档或者代码有误或需要更新，请提交 Issue 或 Pull Request
+- **Issues**: [CompanyBlacklist/CompanyBlacklist](https://github.com/CompanyBlacklist/CompanyBlacklist/issues)
+- **团队讨论**: [CompanyBlacklist/Discussions](https://github.com/CompanyBlacklist/Discussions) (私有仓库，仅限团队成员)
+- **文档更新**: 如发现文档或代码有误，请提交 Issue 或 Pull Request
 
 ---
 
-**版本**: 1.0.0  
-**更新日期**: 2025-12-08  
+**版本**: 2.0.0  
+**更新日期**: 2025-12-11  
 **最后更新者**: CompanyBlacklist Team

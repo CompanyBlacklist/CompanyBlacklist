@@ -22,8 +22,11 @@
 .github/  
 ├── CODEOWNERS                \# \[Security\] 权限锁文件，锁定核心目录给 @Admins  
 ├── workflows/                \# CI/CD 自动化脚本  
-│   ├── etl\_and\_web.yml       \# \[Core\] 数据 ETL \+ Web 构建 \+ 部署  
-│   └── app\_release.yml       \# \[Release\] Flutter App 打包发布  
+│   ├── etl.yml               \# \[Core\] 数据 ETL 处理  
+│   ├── web-deploy.yml        \# \[Core\] Web 构建和部署  
+│   ├── check-labels.yml      \# 标签检查  
+│   ├── code-quality.yml      \# 代码质量检查  
+│   └── sync-labels.yml       \# 标签同步  
 └── ISSUE\_TEMPLATE/           \# Issue 表单模版  
     ├── report.yml            \# 爆料模版 (status:pending)  
     └── appeal.yml            \# 申诉模版 (type:appeal)

@@ -1,0 +1,101 @@
+name: "🐛 Bug 反馈"
+description: "报告网站或功能的 Bug"
+title: "[Bug] "
+labels: ["type:bug"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您提交 Bug 反馈！请尽可能详细地描述问题，以帮助我们快速定位和修复。
+
+  - type: dropdown
+    id: bug-type
+    attributes:
+      label: Bug 类型
+      description: 请选择 Bug 的类型
+      options:
+        - 网站显示问题
+        - 功能无法正常使用
+        - 数据显示错误
+        - 性能问题
+        - 其他
+    validations:
+      required: true
+
+  - type: input
+    id: page-url
+    attributes:
+      label: 问题页面 URL
+      description: 如果是特定页面的问题，请提供 URL
+      placeholder: "https://companyblacklist.github.io/CompanyBlacklist/..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 请详细描述您遇到的问题
+      placeholder: |
+        1. 我在做什么...
+        2. 期望发生什么...
+        3. 实际发生了什么...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 请列出复现此问题的步骤
+      placeholder: |
+        1. 打开网站
+        2. 点击某个按钮
+        3. 看到错误
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: 浏览器
+      description: 您使用的浏览器是什么？
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - 其他
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: 设备类型
+      description: 您使用的设备是什么？
+      options:
+        - 桌面电脑
+        - 笔记本电脑
+        - 手机
+        - 平板
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截图
+      description: 如果有截图，请上传
+      placeholder: "拖拽图片到这里上传"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 其他信息
+      description: 任何其他可能有用的信息
+    validations:
+      required: false

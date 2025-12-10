@@ -1,4 +1,16 @@
-.github/ @Admins
-scripts/ @Admins
-web/ @Admins
-app/ @Admins
+# CODEOWNERS - 代码所有权配置
+# 只有指定的用户/团队才能审批对这些目录的 PR
+
+# 核心脚本和工作流 - 只有开发者和 OpenBlacklist 可以修改
+/scripts/                 @CompanyBlacklist/developers @OpenBlacklist
+/.github/workflows/       @CompanyBlacklist/developers @OpenBlacklist
+/.github/CODEOWNERS       @CompanyBlacklist/developers @OpenBlacklist
+
+# Web 前端
+/web/                     @CompanyBlacklist/developers @OpenBlacklist
+
+# App 客户端
+/app/                     @CompanyBlacklist/developers @OpenBlacklist
+
+# 文档
+/docs/                    @CompanyBlacklist/developers @OpenBlacklist

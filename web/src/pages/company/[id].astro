@@ -583,14 +583,14 @@ if (!companyData) {
     <div class="lg:grid lg:grid-cols-12 lg:gap-8">
       <!-- 主内容区域 -->
       <main class="lg:col-span-9">
+        <!-- 标题 -->
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-4">{companyData.title || companyData.name}</h1>
+        
         <!-- 公司和城市信息 -->
         <div class="flex items-center mb-4">
           <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm mr-2">{companyData.name}</span>
           <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">{companyData.city}</span>
         </div>
-        
-        <!-- 标题 -->
-        <h1 class="text-3xl font-extrabold text-gray-900 mb-4">{companyData.title || companyData.name}</h1>
         
         <!-- 标签 -->
         <div class="mb-8 warning-tags-container">
@@ -918,12 +918,14 @@ if (!companyData) {
   <script is:inline>
     // 页面加载后，为详细描述中的图片添加 Fancybox 支持
     document.addEventListener('DOMContentLoaded', function() {
-      // 为详细描述中的图片添加 Fancybox 支持
-      document.querySelectorAll('.markdown-content img').forEach((img, index) => {
-        // 检查图片是否已经被包裹在链接中
-        if (img.parentElement.tagName !== 'A') {
-          // 确保图片 src 存在
-          if (img.src) {
+      // 使用 requestIdleCallback 或 setTimeout 延迟执行，避免阻塞主线程
+      const initFancybox = () => {
+        const images = document.querySelectorAll('.markdown-content img');
+        
+        // 使用 DocumentFragment 批量操作 DOM，减少重绘
+        images.forEach((img, index) => {
+          // 检查图片是否已经被包裹在链接中
+          if (img.parentElement.tagName !== 'A' && img.src) {
             // 创建一个链接包裹图片
             const link = document.createElement('a');
             link.href = img.src;
@@ -932,17 +934,50 @@ if (!companyData) {
             link.dataset.caption = img.alt || `图片 ${index + 1}`;
             link.className = 'fancybox-link';
             
-            // 保存图片的父元素和兄弟元素
-            const parent = img.parentNode;
-            const nextSibling = img.nextSibling;
-            
-            // 包裹图片
-            link.appendChild(img.cloneNode(true));
-            parent.insertBefore(link, nextSibling);
-            parent.removeChild(img);
+            // 直接替换，避免 cloneNode
+            img.parentNode.replaceChild(link, img);
+            link.appendChild(img);
           }
+        });
+        
+        // 配置 Fancybox 优化性能 - 完全禁用动画
+        if (typeof Fancybox !== 'undefined') {
+          Fancybox.bind('[data-fancybox="gallery"]', {
+            // 完全禁用动画
+            animated: false,
+            showClass: false,
+            hideClass: false,
+            // 禁用预加载
+            preload: 0,
+            // 图片配置
+            Images: {
+              zoom: false,
+              initialSize: 'fit', // 直接适应，不做动画
+            },
+            // 轮播配置 - 禁用过渡
+            Carousel: {
+              transition: false, // 禁用切换过渡
+              friction: 0,
+              Dots: false, // 禁用底部点
+            },
+            // 工具栏精简
+            Toolbar: {
+              display: {
+                left: [],
+                middle: [],
+                right: ['close'],
+              },
+            },
+          });
         }
-      });
+      };
+      
+      // 使用 requestIdleCallback 延迟初始化，优先保证页面渲染
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(initFancybox);
+      } else {
+        setTimeout(initFancybox, 100);
+      }
     });
     
     // 目录生成和滚动高亮功能

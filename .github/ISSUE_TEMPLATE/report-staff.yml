@@ -1,0 +1,94 @@
+name: "🚨 举报工作人员"
+description: "举报志愿者或管理员的不当行为"
+title: "[举报] "
+labels: ["type:report-staff"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > ⚠️ **重要声明**
+        > 
+        > 此表单仅用于举报志愿者或管理员的不当行为。请确保您掌握真实证据，恶意举报将导致账号被封禁。
+        > 
+        > 举报内容将由**组织管理员**直接处理，不经过普通志愿者审核。
+
+  - type: dropdown
+    id: report-type
+    attributes:
+      label: 举报类型
+      description: 请选择您要举报的不当行为类型
+      options:
+        - 审核不公正 (故意通过/拒绝不当内容)
+        - 滥用权限 (未经授权使用敏感标签)
+        - 泄露隐私 (泄露爆料人信息)
+        - 利益冲突 (与被爆料公司有关联)
+        - 态度恶劣 (辱骂、威胁用户)
+        - 其他不当行为
+    validations:
+      required: true
+
+  - type: input
+    id: staff-username
+    attributes:
+      label: 被举报人 GitHub 用户名
+      description: 请填写被举报的志愿者或管理员的 GitHub 用户名
+      placeholder: "@username"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: staff-role
+    attributes:
+      label: 被举报人角色
+      description: 请选择被举报人的角色
+      options:
+        - 初审志愿者 (Volunteers)
+        - 终审管理员 (Admins)
+        - 不确定
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 详细描述
+      description: 请详细描述不当行为的具体情况
+      placeholder: |
+        1. 什么时候发生的？
+        2. 发生了什么？
+        3. 涉及哪个 Issue？（请提供链接）
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 证据材料
+      description: 请上传截图或提供相关链接作为证据
+      placeholder: |
+        - Issue 链接
+        - 截图
+        - 其他证据
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: 影响说明
+      description: 此不当行为造成了什么影响？
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: 确认事项
+      options:
+        - label: 我确认所提供的信息真实可靠
+          required: true
+        - label: 我理解恶意举报将导致我的账号被封禁
+          required: true
+        - label: 我同意接受调查结果
+          required: true

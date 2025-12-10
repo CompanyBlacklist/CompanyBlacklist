@@ -19,10 +19,11 @@
   "audit_info": {
     "first_reviewer": "OpenBlacklist",
     "final_reviewer": "OpenBlacklist",
-    "approved_at": "2025-12-08T18:23:58Z"
+    "approved_at": "2025-12-08T18:23:58Z",
+    "publisher": "OpenBlacklist"
   },
   "source_url": "https://github.com/CompanyBlacklist/CompanyBlacklist/issues/4",
-  "report_url": "https://github.com/OpenBlacklist/CompanyBlacklist/issues/new?template=appeal.yml&title=[申诉] 测试网络科技有限公司 北京 大厂裁员纠纷 - &body=公司ID: 4",
+  "report_url": "https://github.com/CompanyBlacklist/CompanyBlacklist/issues/new?template=appeal.yml&title=[申诉] 测试网络科技有限公司 - 北京&body=公司ID: 4",
   "created_at": "2025-12-08T18:23:48Z",
   "updated_at": "2025-12-08T18:24:14Z"
 }

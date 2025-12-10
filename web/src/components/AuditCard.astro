@@ -3,53 +3,53 @@ const { auditInfo } = Astro.props;
 ---
 
 <div class="card bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl shadow-md overflow-hidden">
-  <div class="bg-blue-600 text-white p-4">
-    <h3 class="text-lg font-bold flex items-center">
-      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+  <div class="bg-blue-600 text-white p-3 md:p-4">
+    <h3 class="text-base md:text-lg font-bold flex items-center">
+      <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
         <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
       </svg>
       审核公示
     </h3>
   </div>
-  <div class="p-5 space-y-4">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-100">
-        <div class="text-xs text-blue-500 mb-1">爆料人</div>
-        <div class="font-medium text-gray-900">@{auditInfo.publisher || '匿名'}</div>
+  <div class="p-3 md:p-5 space-y-3 md:space-y-4">
+    <div class="grid grid-cols-2 gap-2 md:gap-4">
+      <div class="bg-white p-2 md:p-4 rounded-lg shadow-sm border border-blue-100">
+        <div class="text-xs text-blue-500 mb-0.5 md:mb-1">爆料人</div>
+        <div class="font-medium text-gray-900 text-sm md:text-base truncate">@{auditInfo.publisher || '匿名'}</div>
       </div>
-      <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-100">
-        <div class="text-xs text-blue-500 mb-1">初审志愿者</div>
-        <div class="font-medium text-gray-900">@{auditInfo.first_reviewer || '未知'}</div>
+      <div class="bg-white p-2 md:p-4 rounded-lg shadow-sm border border-blue-100">
+        <div class="text-xs text-blue-500 mb-0.5 md:mb-1">初审志愿者</div>
+        <div class="font-medium text-gray-900 text-sm md:text-base truncate">@{auditInfo.first_reviewer || '未知'}</div>
       </div>
-      <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-100">
-        <div class="text-xs text-blue-500 mb-1">终审管理员</div>
-        <div class="font-medium text-gray-900">@{auditInfo.final_reviewer || '未知'}</div>
+      <div class="bg-white p-2 md:p-4 rounded-lg shadow-sm border border-blue-100">
+        <div class="text-xs text-blue-500 mb-0.5 md:mb-1">终审管理员</div>
+        <div class="font-medium text-gray-900 text-sm md:text-base truncate">@{auditInfo.final_reviewer || '未知'}</div>
       </div>
-      <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-100">
-        <div class="text-xs text-blue-500 mb-1">审核通过时间</div>
-        <div class="font-medium text-gray-900">
-          {auditInfo.approved_at ? new Date(auditInfo.approved_at).toLocaleString('zh-CN', { dateStyle: 'short', timeStyle: 'short' }) : '未知'}
+      <div class="bg-white p-2 md:p-4 rounded-lg shadow-sm border border-blue-100">
+        <div class="text-xs text-blue-500 mb-0.5 md:mb-1">审核通过时间</div>
+        <div class="font-medium text-gray-900 text-sm md:text-base">
+          {auditInfo.approved_at ? new Date(auditInfo.approved_at).toLocaleDateString('zh-CN') : '未知'}
         </div>
       </div>
     </div>
-    <div class="bg-gradient-to-r from-amber-50 to-yellow-50 p-4 rounded-lg border border-amber-200">
+    <div class="bg-gradient-to-r from-amber-50 to-yellow-50 p-2.5 md:p-4 rounded-lg border border-amber-200">
       <div class="flex items-start">
-        <svg class="w-5 h-5 text-amber-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 md:w-5 md:h-5 text-amber-500 mr-1.5 md:mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
           <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
         </svg>
-        <p class="text-sm text-amber-700">
-          本信息已经过双重审核（初审志愿者 + 终审管理员），但仍建议您在入职前进一步核实，谨慎做出职业选择。
+        <p class="text-xs md:text-sm text-amber-700">
+          本信息已经过双重审核，但仍建议您入职前进一步核实。
         </p>
       </div>
     </div>
-    <div class="bg-white p-4 rounded-lg shadow-sm border border-green-100">
-      <div class="flex items-start">
-        <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+    <div class="bg-white p-2.5 md:p-4 rounded-lg shadow-sm border border-green-100">
+      <div class="flex items-center">
+        <svg class="w-4 h-4 md:w-5 md:h-5 text-green-500 mr-1.5 md:mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
           <path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" clip-rule="evenodd"></path>
         </svg>
         <div>
-          <div class="text-sm font-medium text-green-700">审核标准</div>
-          <p class="text-xs text-green-600 mt-1">信息真实、证据充分、表述客观、无恶意诽谤</p>
+          <span class="text-xs md:text-sm font-medium text-green-700">审核标准：</span>
+          <span class="text-xs text-green-600">信息真实、证据充分、表述客观</span>
         </div>
       </div>
     </div>
