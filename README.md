@@ -1,3 +1,12 @@
+# 网站访问
+[companyblacklist.github.io](https://companyblacklist.github.io/)
+
+[openblacklist.github.io](https://openblacklist.github.io/)
+
+- **生产环境**：https://companyblacklist.github.io/CompanyBlacklist
+- **API 基础路径**：https://companyblacklist.github.io/CompanyBlacklist/static_api/v1
+
+
 # CompanyBlacklist (职场避雷针)
 
 一个公益性质的企业违规行为曝光平台，旨在帮助职场人士规避不良企业，维护自身合法权益。
@@ -156,8 +165,3 @@ npm run build
 - 数据经过严格的双重审核
 - 数据格式采用 JSON，托管在 GitHub Pages
 - 支持跨域访问，可被其他应用调用
-
-## 网站访问
-
-- **生产环境**：https://companyblacklist.github.io/CompanyBlacklist
-- **API 基础路径**：https://companyblacklist.github.io/CompanyBlacklist/static_api/v1
