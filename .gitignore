@@ -20,3 +20,4 @@ localdocs/
 
 # ide
 .trae/
+.vscode/
