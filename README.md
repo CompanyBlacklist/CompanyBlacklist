@@ -116,7 +116,15 @@
 
 ## 联系我们
 
-如有问题或建议，欢迎通过 GitHub Issues 与我们联系。
+- 💬 **社区讨论**：[GitHub Discussions](https://github.com/CompanyBlacklist/CompanyBlacklist/discussions)
+- 📢 **问题反馈**：[GitHub Issues](https://github.com/CompanyBlacklist/CompanyBlacklist/issues)
+
+## 支持项目
+
+如果您觉得本项目有帮助，欢迎通过以下方式支持我们：
+
+- ⭐ **Star 本仓库**
+- 💜 **赞助支持**：[爱发电](https://afdian.com/a/Ableand)
 
 ## 开发与部署
 
