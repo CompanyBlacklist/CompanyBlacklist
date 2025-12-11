@@ -1,0 +1,29 @@
+{
+  "id": 5,
+  "name": "虚拟初创企业A",
+  "city": "深圳",
+  "tags": [
+    "强制加班（996/007/其他？）",
+    "社保公积金违规",
+    "竞业协议违规",
+    "强迫辞职",
+    "其他问题"
+  ],
+  "title": "gr个人错误",
+  "body_html": "<h3>公司全称</h3>\n<p>虚拟初创企业A</p>\n<h3>所在城市</h3>\n<p>深圳</p>\n<h3>问题标签</h3>\n<ul>\n<li><p> 强制加班（996/007/其他？）</p>\n</li>\n<li><p> 社保公积金违规</p>\n</li>\n<li><p> 竞业协议违规</p>\n</li>\n<li><p> 强迫辞职</p>\n</li>\n<li><p> 其他问题</p>\n</li>\n</ul>\n<h3>详细描述</h3>\n<p><strong>面试造火箭，入职拧螺丝。</strong></p>\n<ul>\n<li><strong>关于加班</strong>：面试说弹性工作制，结果是“弹走下班时间”。每天强制开会到晚上 10 点，周末必须要在公司打卡，没有加班费，只有“调休”（根本不批）。</li>\n<li><strong>关于社保</strong>：入职三个月才发现社保一直是<strong>未缴纳状态</strong>，财务借口说系统升级，其实就是为了省钱。</li>\n<li><strong>试用期</strong>：承诺试用期全薪，发工资时只发了 80%。</li>\n</ul>\n<h3>证据材料</h3>\n<ol>\n<li><strong>打卡记录导出</strong>：<a href=\"https://example.com\">查看表格</a> - 显示平均离职时间为 23:45。</li>\n<li><strong>社保局查询截图</strong>：显示近三月无缴纳记录。</li>\n</ol>\n<p><img /></p>\n<ol>\n<li><strong>打卡记录导出</strong>：<a href=\"https://example.com\">查看表格</a> - 显示平均离职时间为 23:45。</li>\n<li><strong>社保局查询截图</strong>：显示近三月无缴纳记录。</li>\n</ol>\n<p><img /></p>\n<h3>声明与承诺</h3>\n<ul>\n<li> 我保证所提供的信息真实可靠</li>\n<li> 我同意公开我的 GitHub 用户名（用于身份验证）</li>\n<li> 我已阅读并同意项目的《免责声明》</li>\n</ul>\n",
+  "raw_body": "### 公司全称\n\n虚拟初创企业A\n\n### 所在城市\n\n深圳\n\n### 问题标签\n\n- [x] 强制加班（996/007/其他？）\n- [ ] 拖欠工资/奖金\n- [ ] 裁员不赔偿\n- [ ] 职场PUA/精神压迫\n- [x] 社保公积金违规\n- [ ] 试用期违规\n- [ ] 职场歧视（性别/年龄/地域等）\n- [ ] 虚假招聘\n- [x] 竞业协议违规\n- [x] 强迫辞职\n- [ ] 不提供离职证明\n- [ ] 劳动保护缺失\n- [ ] 培训费用陷阱\n- [x] 其他问题\n\n### 详细描述\n\n**面试造火箭，入职拧螺丝。**\n\n- **关于加班**：面试说弹性工作制，结果是“弹走下班时间”。每天强制开会到晚上 10 点，周末必须要在公司打卡，没有加班费，只有“调休”（根本不批）。\n- **关于社保**：入职三个月才发现社保一直是**未缴纳状态**，财务借口说系统升级，其实就是为了省钱。\n- **试用期**：承诺试用期全薪，发工资时只发了 80%。\n\n### 证据材料\n\n1. **打卡记录导出**：[查看表格](https://example.com) - 显示平均离职时间为 23:45。\n2. **社保局查询截图**：显示近三月无缴纳记录。\n\n![Image](https://github.com/user-attachments/assets/c5b958eb-7f66-4736-b936-56a0935c1c63)\n1. **打卡记录导出**：[查看表格](https://example.com) - 显示平均离职时间为 23:45。\n2. **社保局查询截图**：显示近三月无缴纳记录。\n\n![Image](https://github.com/user-attachments/assets/395ce118-c88f-4fdf-a743-bdc7b26fd639)\n\n### 声明与承诺\n\n- [x] 我保证所提供的信息真实可靠\n- [x] 我同意公开我的 GitHub 用户名（用于身份验证）\n- [x] 我已阅读并同意项目的《免责声明》",
+  "images": [
+    "https://github.com/user-attachments/assets/c5b958eb-7f66-4736-b936-56a0935c1c63",
+    "https://github.com/user-attachments/assets/395ce118-c88f-4fdf-a743-bdc7b26fd639"
+  ],
+  "audit_info": {
+    "first_reviewer": "OpenBlacklist",
+    "final_reviewer": "OpenBlacklist",
+    "approved_at": "2025-12-10T17:47:03Z",
+    "publisher": "OpenBlacklist"
+  },
+  "source_url": "https://github.com/CompanyBlacklist/CompanyBlacklist/issues/5",
+  "report_url": "https://github.com/CompanyBlacklist/CompanyBlacklist/issues/new?template=appeal.yml&title=[申诉] 虚拟初创企业A - 深圳&body=公司ID: 5",
+  "created_at": "2025-12-08T18:25:39Z",
+  "updated_at": "2025-12-10T18:24:31Z"
+}

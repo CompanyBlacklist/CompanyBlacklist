@@ -20,8 +20,18 @@ jobs:
       # 允许访问 issues
       issues: read
     steps:
+      # 使用 GitHub App 生成 Token，可绕过分支保护规则
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.BOT_APP_ID }}
+          private_key: ${{ secrets.BOT_PRIVATE_KEY }}
+
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -37,8 +47,8 @@ jobs:
       - name: Run ETL script
         working-directory: scripts
         env:
-          # GitHub API Token，用于访问 GitHub Issues
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 使用 App Token 访问 GitHub Issues
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
           # ETL 配置
           GITHUB_OWNER: CompanyBlacklist
           GITHUB_REPO: CompanyBlacklist
@@ -48,8 +58,6 @@ jobs:
         run: |
           echo "Checking static_api directory..."
           ls -la static_api/v1/ || echo "Directory not found"
-          echo "Checking scripts/static_api directory..."
-          ls -la scripts/static_api/v1/ 2>/dev/null || echo "Not found in scripts/"
 
       - name: Upload generated API data
         uses: actions/upload-artifact@v4
@@ -60,9 +68,9 @@ jobs:
 
       - name: Commit and push generated data
         run: |
-          # 配置 Git 信息
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # 配置 Git 信息（使用 App Bot 身份）
+          git config user.name "blacklist-bypass-bot[bot]"
+          git config user.email "blacklist-bypass-bot[bot]@users.noreply.github.com"
           
           # 检查是否有更改
           git status
@@ -76,9 +84,8 @@ jobs:
             exit 0
           else
             # 提交更改
-            git commit -m "Update static API data via GitHub Actions"
+            git commit -m "chore: update static API data via ETL"
             
-            # 推送更改
+            # 推送更改（使用 App Token 可绕过分支保护）
             git push origin ${{ github.ref }}
           fi
-        continue-on-error: true
